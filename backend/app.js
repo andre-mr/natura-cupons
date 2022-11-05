@@ -4,6 +4,8 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
+const database = require("./database");
+
 app.use(cors());
 // app.use(express.json());
 
@@ -63,10 +65,38 @@ const htmlResponse = `<!DOCTYPE html>
 </html>
 `;
 
-app.get("/", function (req, res) {
+app.get("/", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.write(htmlResponse);
+  res.send();
+});
+
+app.get("/coupons/all", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.getCoupons()));
+  res.send();
+});
+
+app.post("/coupons/add", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.addCoupon(req.query.coupon)));
+  res.send();
+});
+
+app.put("/coupons/update", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.updateCoupon(req.query.coupon)));
+  res.send();
+});
+
+app.delete("/coupons/delete", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.deleteCoupon(req.query.coupon)));
   res.send();
 });
 
