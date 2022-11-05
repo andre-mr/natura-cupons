@@ -98,5 +98,34 @@
       </div>
       <div id="configSection" class="section hidden">Configurações</div>
     </main>
+    <div id="modalBackground"></div>
+    <div id="modalContainer">
+      <div id="editModal" class="modalWindow">
+        <p id="editCouponCode" class="modalTextCoupon">CUPOM-01</p>
+        <div class="modalLine">
+          <p class="modalText">Adicionado em:</p>
+          <input id="editCouponCreated" class="editCouponInput" type="date" />
+        </div>
+        <div class="modalLine">
+          <p class="modalText">Expira em:</p>
+          <input id="editCouponExpired" class="editCouponInput" type="date" />
+        </div>
+        <div class="modalLine">
+          <p class="modalText">Usos:</p>
+          <input
+            id="editCouponUses"
+            class="editCouponInput"
+            type="number"
+            step="1"
+            min="0"
+          />
+        </div>
+        <div class="modalLine modalButtons">
+          <div class="defaultButton">Cancelar</div>
+          <div class="defaultButton">Salvar</div>
+        </div>
+      </div>
+      <div id="removeModal" class="modalWindow hidden"></div>
+    </div>
   </body>
 </html>
