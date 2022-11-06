@@ -1,5 +1,6 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -7,7 +8,9 @@ const port = process.env.PORT || 3000;
 const database = require("./database");
 
 app.use(cors());
-// app.use(express.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json());
 
 const htmlResponse = `<!DOCTYPE html>
 <html>
@@ -82,21 +85,21 @@ app.get("/coupons/all", async (req, res) => {
 app.post("/coupons/add", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await database.addCoupon(req.query.coupon)));
+  res.write(JSON.stringify(await database.addCoupon(req.body)));
   res.send();
 });
 
 app.put("/coupons/update", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await database.updateCoupon(req.query.coupon)));
+  res.write(JSON.stringify(await database.updateCoupon(req.body)));
   res.send();
 });
 
 app.delete("/coupons/delete", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await database.deleteCoupon(req.query.coupon)));
+  res.write(JSON.stringify(await database.deleteCoupon(req.body)));
   res.send();
 });
 

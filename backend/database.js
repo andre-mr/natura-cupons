@@ -2,8 +2,14 @@ const mysql = require("mysql2/promise.js");
 
 async function addCoupon(coupon) {
   return await sqlInsert(
-    `INSERT INTO coupon (code, created, expired, uses) VALUES (?) `,
-    [coupon.code, coupon.created, coupon.expired, coupon.uses]
+    `INSERT INTO coupon (code, created, expired, redirects, uses) VALUES (?) `,
+    [
+      coupon.code,
+      formatDateTime(coupon.created),
+      formatDateTime(coupon.expired),
+      coupon.redirects,
+      coupon.uses,
+    ]
   );
 }
 
@@ -16,11 +22,12 @@ async function getCoupons() {
 }
 
 async function updateCoupon(coupon) {
-  let sql = `UPDATE coupon SET code=?, created=?, expired=?, uses=? WHERE id=? `;
+  let sql = `UPDATE coupon SET code=?, created=?, expired=?, redirects=?, uses=? WHERE id=? `;
   let values = [
     coupon.code,
-    coupon.created,
-    coupon.expired,
+    formatDateTime(coupon.created),
+    formatDateTime(coupon.expired),
+    coupon.redirects,
     coupon.uses,
     coupon.id,
   ];
@@ -83,6 +90,16 @@ async function sqlUpdateOrDelete(updateStatement, values) {
   });
   connection.end();
   return true;
+}
+
+function formatDateTime(timestamp) {
+  return `${timestamp.substring(0, 4)}-${timestamp.substring(
+    5,
+    7
+  )}-${timestamp.substring(8, 10)} ${timestamp.substring(
+    11,
+    13
+  )}:${timestamp.substring(14, 16)}:${timestamp.substring(17, 19)}`;
 }
 
 module.exports = { addCoupon, getCoupons, updateCoupon, deleteCoupon };

@@ -35,16 +35,6 @@ main {
   justify-content: space-between;
 }
 
-.section {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: center;
-  overflow-y: scroll;
-}
-
 select {
   margin-left: 1%;
   height: 75%;
@@ -56,31 +46,6 @@ select {
   height: 80%;
   border: 0;
   box-shadow: 2px 2px 6px lightgray;
-}
-
-#logoutButton {
-  background-color: white;
-  box-shadow: 2px 2px 6px lightgray;
-  cursor: pointer;
-  color: black;
-  height: 80%;
-  border-radius: 0.3rem;
-  margin-right: 1%;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  font-size: large;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-}
-
-#logoutButton:hover {
-  background-color: whitesmoke;
-}
-
-#logoutButton:active {
-  background-color: whitesmoke;
-  transform: translate(0.1rem, 0.1rem);
 }
 
 option {
@@ -110,6 +75,16 @@ li {
   margin-bottom: 1rem;
 }
 
+.section {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  overflow-y: scroll;
+}
+
 .listContainer {
   width: 100%;
   height: 100%;
@@ -125,42 +100,58 @@ li {
   cursor: pointer;
 }
 
-.liTextCode {
+#liTextCode {
   width: 30%;
   display: flex;
   justify-content: start;
   align-items: center;
-  font-size: larger;
   margin-left: 1rem;
   margin-right: 1rem;
   font-weight: bold;
 }
 
+#removeCouponCode {
+  margin-bottom: 4rem;
+}
+
+.textDanger {
+  color: red;
+}
+
 .liTextDateContainer {
-  width: 30%;
+  width: 20%;
   display: flex;
   flex-direction: column;
   justify-content: start;
   align-items: flex-start;
 }
 
+.liTextUsesContainer {
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
 .liTextDateText {
   display: flex;
+  justify-content: center;
+  width: 100%;
   margin-bottom: 0.5rem;
 }
 
 .liTextDate {
+  width: 100%;
   font-size: medium;
+  display: flex;
+  justify-content: center;
 }
 
-.liTextUses {
-  width: 10%;
-  display: flex;
-  justify-content: end;
-  align-items: center;
+.liTextBig {
   font-size: larger;
-  margin-left: 1rem;
-  margin-right: 1rem;
   font-weight: bold;
 }
 
@@ -172,7 +163,7 @@ li {
   justify-content: space-between;
 }
 
-.liID {
+#liID {
   display: none;
 }
 
@@ -184,10 +175,16 @@ li {
   fill: red;
 }
 
-#couponsCount,
-#usesCount {
+.countContainer {
+  display: flex;
   margin-left: 1rem;
   margin-right: 1rem;
+}
+
+#usesCount,
+#couponsCount,
+#redirectsCount {
+  margin-right: 0.5rem;
 }
 
 #listSectionHeader {
@@ -204,7 +201,9 @@ li {
 }
 
 #couponsSort {
-  height: 90%;
+  height: 100%;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
 }
 
 #couponsSortContainer {
@@ -226,12 +225,6 @@ li {
 }
 
 .defaultButton {
-  height: 90%;
-  background-color: white;
-  border-color: dodgerblue;
-  color: dodgerblue;
-  border-style: solid;
-  border-width: 2px;
   box-shadow: 2px 2px 6px lightgray;
   cursor: pointer;
   display: flex;
@@ -239,18 +232,44 @@ li {
   align-items: center;
   margin-left: 1rem;
   margin-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
   padding-left: 1rem;
   padding-right: 1rem;
   border-radius: 0.3rem;
 }
 
-.defaultButton:hover {
-  background-color: aliceblue;
+.defaultButton:active {
+  transform: translate(0.1rem, 0.1rem);
 }
 
-.defaultButton:active {
-  background-color: aliceblue;
-  transform: translate(0.1rem, 0.1rem);
+.defaultButton:hover {
+  filter: brightness(120%);
+}
+
+.cancelButton {
+  background-color: gray;
+  color: white;
+}
+
+.saveButton {
+  background-color: green;
+  color: white;
+}
+
+.deleteButton {
+  background-color: red;
+  color: white;
+}
+
+.primaryButton {
+  background-color: dodgerblue;
+  color: white;
+}
+
+#logoutButton {
+  height: 70%;
+  font-weight: bold;
 }
 
 #modalBackground {
@@ -276,6 +295,10 @@ li {
   height: 100%;
 }
 
+#removeModal {
+  height: 35%;
+}
+
 .modalWindow {
   display: flex;
   flex-direction: column;
@@ -283,8 +306,22 @@ li {
   align-items: center;
   background-color: white;
   border-radius: 0.3rem;
-  width: 50%;
+  width: 40%;
   height: 50%;
+}
+
+#editCouponCode {
+  /* text-transform: uppercase; */
+  text-align: center;
+  font-weight: bold;
+  width: 60%;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.requiredField {
+  border-style: solid;
+  border-color: red !important;
 }
 
 .modalText {
@@ -298,7 +335,7 @@ li {
 }
 
 .modalLine {
-  width: 50%;
+  width: 60%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -309,11 +346,16 @@ li {
   margin-top: 2rem;
 }
 
+#editCouponRedirects {
+  width: 60px;
+}
+
 #editCouponUses {
   width: 60px;
 }
 
 .editCouponInput {
+  font-size: medium;
   border-color: lightgray;
   border-radius: 0.3rem;
   padding: 0.3rem;
@@ -325,20 +367,11 @@ li {
   }
 
   .liContent {
-    width: 100%;
-    height: auto;
-    display: flex;
     flex-direction: column;
-    justify-content: space-between;
   }
 
-  .liTextCode {
+  #liTextCode {
     width: 100%;
-    display: flex;
-    justify-content: start;
-    font-size: larger;
-    margin-left: 1rem;
-    margin-right: 1rem;
     margin-bottom: 1rem;
   }
 
@@ -403,18 +436,26 @@ li {
     background-color: white;
     border-radius: 0.3rem;
     width: 90%;
-    height: 50%;
+    height: 60%;
   }
 
   .modalLine {
-    width: 50%;
+    width: 80%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  #modalEditCancelButton,
+  #modalSaveButton,
+  #modalRemoveButton {
+    height: 40px;
+    margin-top: 1rem;
     margin-bottom: 1rem;
   }
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }

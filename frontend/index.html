@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Cupons Natura</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script defer src="main.js"></script>
   </head>
@@ -15,18 +16,18 @@
         <option value="configuracoes">Configurações</option>
       </select>
       <h2 id="headerTitle">Cupons</h2>
-      <div id="logoutButton">Sair</div>
+      <div id="logoutButton" class="defaultButton cancelButton">Sair</div>
     </header>
     <main>
       <div id="listSection" class="section">
         <div id="listSectionHeader">
-          <div id="couponsCount" class="headerText">00 Cupons</div>
           <div id="couponsSortContainer">
             <select id="couponsSort">
-              <option selected value="created">Adicionado em</option>
               <option value="code">Código</option>
+              <option selected value="created">Adicionado em</option>
               <option value="expired">Expira em</option>
-              <option value="uses">Usos</option>
+              <option value="redirects">Acessos</option>
+              <option value="uses">Utilizações</option>
             </select>
             <svg
               id="arrowUp"
@@ -51,8 +52,21 @@
               />
             </svg>
           </div>
-          <div id="addCouponButton" class="defaultButton">ADICIONAR</div>
-          <div id="usesCount" class="headerText">00 Usos</div>
+          <div class="headerText countContainer">
+            <p id="couponsCount">00</p>
+            <p>Cupons</p>
+          </div>
+          <div class="headerText countContainer">
+            <p id="redirectsCount">00</p>
+            <p>Acessos</p>
+          </div>
+          <div class="headerText countContainer">
+            <p id="usesCount">00</p>
+            <p>Utilizações</p>
+          </div>
+          <div id="addCouponButton" class="defaultButton primaryButton">
+            ADICIONAR
+          </div>
         </div>
         <div class="listContainer">
           <ul id="couponsList">
@@ -69,17 +83,24 @@
                 />
               </svg>
               <div class="liContent">
-                <p class="liID">1</p>
-                <p class="liTextCode">CUPOM-001</p>
+                <p id="liID">1</p>
+                <p id="liTextCode" class="liTextBig">CUPOM-01</p>
                 <div class="liTextDateContainer">
                   <p class="liTextDateText">Adicionado em:</p>
-                  <p class="liTextDate">04/11/2022</p>
+                  <p id="liTextDateCreated" class="liTextDate">04/11/2022</p>
                 </div>
                 <div class="liTextDateContainer">
                   <p class="liTextDateText">Expira em:</p>
-                  <p class="liTextDate">05/11/2022</p>
+                  <p id="liTextDateExpired" class="liTextDate">05/11/2022</p>
                 </div>
-                <p class="liTextUses">Usos: 10</p>
+                <div class="liTextDateContainer">
+                  <p class="liTextDateText">Acessos:</p>
+                  <p id="liTextRedirects" class="liTextDate">15</p>
+                </div>
+                <div class="liTextUsesContainer">
+                  <p class="liTextDateText">Utilizações:</p>
+                  <p id="liTextUses" class="liTextBig">10</p>
+                </div>
               </div>
               <svg
                 id="removeButton"
@@ -98,20 +119,37 @@
       </div>
       <div id="configSection" class="section hidden">Configurações</div>
     </main>
-    <div id="modalBackground"></div>
-    <div id="modalContainer">
+    <div id="modalBackground" class="hidden"></div>
+    <div id="modalContainer" class="hidden">
       <div id="editModal" class="modalWindow">
-        <p id="editCouponCode" class="modalTextCoupon">CUPOM-01</p>
+        <input id="editCouponCode" class="editCouponInput" required />
         <div class="modalLine">
           <p class="modalText">Adicionado em:</p>
-          <input id="editCouponCreated" class="editCouponInput" type="date" />
+          <input
+            id="editCouponCreated"
+            class="editCouponInput"
+            type="date"
+            disabled
+          />
         </div>
         <div class="modalLine">
           <p class="modalText">Expira em:</p>
           <input id="editCouponExpired" class="editCouponInput" type="date" />
         </div>
         <div class="modalLine">
-          <p class="modalText">Usos:</p>
+          <p class="modalText">Acessos:</p>
+          <input
+            id="editCouponRedirects"
+            class="editCouponInput"
+            type="number"
+            step="1"
+            min="0"
+            value="10"
+            disabled
+          />
+        </div>
+        <div class="modalLine">
+          <p class="modalText">Utilizações:</p>
           <input
             id="editCouponUses"
             class="editCouponInput"
@@ -121,11 +159,26 @@
           />
         </div>
         <div class="modalLine modalButtons">
-          <div class="defaultButton">Cancelar</div>
-          <div class="defaultButton">Salvar</div>
+          <div id="modalEditCancelButton" class="defaultButton cancelButton">
+            Cancelar
+          </div>
+          <div id="modalSaveButton" class="defaultButton saveButton">
+            Atualizar
+          </div>
         </div>
       </div>
-      <div id="removeModal" class="modalWindow hidden"></div>
+      <div id="removeModal" class="modalWindow hidden">
+        <p id="removeCouponCode" class="modalTextCoupon">CUPOM-01</p>
+        <p class="modalText">Excluir definitivamente?</p>
+        <div class="modalLine modalButtons">
+          <div id="modalRemoveCancelButton" class="defaultButton cancelButton">
+            Cancelar
+          </div>
+          <div id="modalRemoveButton" class="defaultButton deleteButton">
+            Excluir
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
