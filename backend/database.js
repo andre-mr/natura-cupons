@@ -2,33 +2,50 @@ const mysql = require("mysql2/promise.js");
 
 async function addCoupon(coupon) {
   return await sqlInsert(
-    `INSERT INTO coupon (code, created, expired, redirects, uses) VALUES (?) `,
+    `INSERT INTO coupon (code, uses, expired, redirects, created, skips, active) VALUES (?) `,
     [
       coupon.code,
-      formatDateTime(coupon.created),
+      coupon.uses,
       formatDateTime(coupon.expired),
       coupon.redirects,
-      coupon.uses,
+      formatDateTime(coupon.created),
+      0,
+      1,
     ]
   );
 }
 
-async function getCoupons() {
+async function getCouponsActive() {
   return sqlSelect(
     `SELECT * 
-    FROM coupon 
+    FROM coupon WHERE active = 1 
+    ORDER BY id ASC;`
+  );
+}
+
+async function getCouponsInactive() {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - 1);
+  const dateFormatted = `${date.getFullYear()}-${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  return sqlSelect(
+    `SELECT * 
+    FROM coupon WHERE active = 0 AND created > '${dateFormatted}' 
     ORDER BY id ASC;`
   );
 }
 
 async function updateCoupon(coupon) {
-  let sql = `UPDATE coupon SET code=?, created=?, expired=?, redirects=?, uses=? WHERE id=? `;
+  let sql = `UPDATE coupon SET code=?, uses=?, expired=?, redirects=?, created=?, skips=?, active=? WHERE id=? `;
   let values = [
     coupon.code,
-    formatDateTime(coupon.created),
+    coupon.uses,
     formatDateTime(coupon.expired),
     coupon.redirects,
-    coupon.uses,
+    formatDateTime(coupon.created),
+    coupon.skips,
+    coupon.active,
     coupon.id,
   ];
   return await sqlUpdateOrDelete(sql, values);
@@ -38,6 +55,23 @@ async function deleteCoupon(coupon) {
   let sql = `DELETE FROM coupon WHERE id=? `;
   let values = [coupon.id];
   return await sqlUpdateOrDelete(sql, values);
+}
+
+async function getConfigs() {
+  return sqlSelect(
+    `SELECT * 
+    FROM configs 
+    ORDER BY description ASC;`
+  );
+}
+
+async function updateConfigs(configs) {
+  const sql = `UPDATE configs SET value=? WHERE description=? `;
+  for (const config of configs) {
+    const values = [config.value, config.description];
+    await sqlUpdateOrDelete(sql, values);
+  }
+  return true;
 }
 
 async function sqlInsert(insertStatement, values) {
@@ -102,4 +136,12 @@ function formatDateTime(timestamp) {
   )}:${timestamp.substring(14, 16)}:${timestamp.substring(17, 19)}`;
 }
 
-module.exports = { addCoupon, getCoupons, updateCoupon, deleteCoupon };
+module.exports = {
+  addCoupon,
+  getCouponsActive,
+  getCouponsInactive,
+  updateCoupon,
+  deleteCoupon,
+  getConfigs,
+  updateConfigs,
+};

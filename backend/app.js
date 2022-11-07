@@ -75,10 +75,24 @@ app.get("/", async (req, res) => {
   res.send();
 });
 
-app.get("/coupons/all", async (req, res) => {
+app.get("/coupons/active", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await database.getCoupons()));
+  res.write(JSON.stringify(await database.getCouponsActive()));
+  res.send();
+});
+
+app.get("/coupons/inactive", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.getCouponsInactive()));
+  res.send();
+});
+
+app.get("/configs/all", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.getConfigs()));
   res.send();
 });
 
@@ -93,6 +107,13 @@ app.put("/coupons/update", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.write(JSON.stringify(await database.updateCoupon(req.body)));
+  res.send();
+});
+
+app.put("/configs/update", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.updateConfigs(req.body)));
   res.send();
 });
 

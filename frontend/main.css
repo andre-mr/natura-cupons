@@ -9,17 +9,10 @@ body {
   width: 100%;
 }
 
-#headerTitle {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  font-size: larger;
-}
-
 header {
   color: white;
   background-color: #ff6b0b;
-  height: 7%;
+  height: 6%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -63,16 +56,84 @@ ul {
 }
 
 li {
-  background-color: azure;
-  box-shadow: 2px 2px 8px lightgray;
-  width: 95%;
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 8px darkgray;
+  width: 100%;
   list-style-type: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* height: 50px; */
-  padding: 1rem;
+  /* padding: 0.5rem; */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   margin-bottom: 1rem;
+}
+
+input {
+  /* background-color: whitesmoke; */
+  cursor: pointer;
+}
+
+/* #headerTitle {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: larger;
+} */
+
+#liTextCode {
+  width: 30%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  align-self: center;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 1rem;
+  font-weight: bold;
+}
+
+#liTextUses {
+  text-align: center;
+}
+
+#liTextDateExpired,
+#liTextDateCreated {
+  align-self: center;
+  width: 80%;
+  text-align: center;
+}
+
+#liTextDateExpired {
+  font-weight: bold;
+}
+
+#liTextDateCreated::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.cursorPointer {
+  cursor: pointer;
+}
+
+.cursorDefault {
+  cursor: default;
+}
+
+#removeCouponCode {
+  margin-bottom: 4rem;
+}
+
+#liID {
+  display: none;
+}
+
+/* #editButton {
+  fill: orange;
+} */
+
+#removeButton {
+  fill: red;
 }
 
 .section {
@@ -85,8 +146,95 @@ li {
   overflow-y: scroll;
 }
 
-.listContainer {
+#usesCount,
+#couponsCount,
+#redirectsCount {
+  margin-left: 0.5rem;
+}
+
+#listSectionHeader {
+  width: 98%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: larger;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  box-shadow: 2px 2px 6px lightgray;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#couponsSort {
+  height: 100%;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+#couponsSortContainer {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+#logoutButton {
+  height: 60%;
+  font-weight: bold;
+}
+
+#modalBackground {
+  background-color: black;
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
   width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalContainer {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#removeModal {
+  height: 35%;
+}
+
+#editCouponCode {
+  /* text-transform: uppercase; */
+  text-align: center;
+  font-weight: bold;
+  width: 60%;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+#editCouponRedirects {
+  width: 60px;
+}
+
+#editCouponUses {
+  width: 60px;
+}
+
+.listCouponInput {
+  width: 50%;
+  padding: 0.5rem;
+}
+
+.listContainer {
+  width: 98%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -94,24 +242,11 @@ li {
 }
 
 .liIcon {
+  width: 5%;
   height: 20px;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
   cursor: pointer;
-}
-
-#liTextCode {
-  width: 30%;
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  font-weight: bold;
-}
-
-#removeCouponCode {
-  margin-bottom: 4rem;
 }
 
 .textDanger {
@@ -122,7 +257,7 @@ li {
   width: 20%;
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: space-between;
   align-items: flex-start;
 }
 
@@ -130,7 +265,7 @@ li {
   width: 15%;
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: space-between;
   align-items: center;
   margin-left: 1rem;
   margin-right: 1rem;
@@ -140,7 +275,7 @@ li {
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
 }
 
 .liTextDate {
@@ -163,52 +298,10 @@ li {
   justify-content: space-between;
 }
 
-#liID {
-  display: none;
-}
-
-#editButton {
-  fill: orange;
-}
-
-#removeButton {
-  fill: red;
-}
-
 .countContainer {
   display: flex;
   margin-left: 1rem;
   margin-right: 1rem;
-}
-
-#usesCount,
-#couponsCount,
-#redirectsCount {
-  margin-right: 0.5rem;
-}
-
-#listSectionHeader {
-  width: 95%;
-  height: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: larger;
-  padding: 1rem;
-  box-shadow: 2px 2px 6px lightgray;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-#couponsSort {
-  height: 100%;
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
-}
-
-#couponsSortContainer {
-  display: flex;
-  align-items: center;
 }
 
 .arrowIcon {
@@ -267,38 +360,6 @@ li {
   color: white;
 }
 
-#logoutButton {
-  height: 70%;
-  font-weight: bold;
-}
-
-#modalBackground {
-  background-color: black;
-  opacity: 0.5;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#modalContainer {
-  position: absolute;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-#removeModal {
-  height: 35%;
-}
-
 .modalWindow {
   display: flex;
   flex-direction: column;
@@ -308,15 +369,6 @@ li {
   border-radius: 0.3rem;
   width: 40%;
   height: 50%;
-}
-
-#editCouponCode {
-  /* text-transform: uppercase; */
-  text-align: center;
-  font-weight: bold;
-  width: 60%;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
 }
 
 .requiredField {
@@ -346,19 +398,44 @@ li {
   margin-top: 2rem;
 }
 
-#editCouponRedirects {
-  width: 60px;
-}
-
-#editCouponUses {
-  width: 60px;
-}
-
 .editCouponInput {
-  font-size: medium;
   border-color: lightgray;
+  font-size: medium;
+  text-align: center;
   border-radius: 0.3rem;
-  padding: 0.3rem;
+  padding: 0.2rem;
+}
+
+.configContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.configLine {
+  font-size: large;
+  border-radius: 0.3rem;
+  box-shadow: 2px 2px 6px gray;
+  width: 40%;
+  margin-top: 1rem;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.configText {
+  display: flex;
+  justify-content: start;
+}
+
+.configInput {
+  font-size: large;
+  font-weight: bold;
+  width: 60px;
 }
 
 @media only screen and (max-width: 768px) {
@@ -368,11 +445,6 @@ li {
 
   .liContent {
     flex-direction: column;
-  }
-
-  #liTextCode {
-    width: 100%;
-    margin-bottom: 1rem;
   }
 
   .liTextDateContainer {
@@ -421,7 +493,6 @@ li {
     margin-bottom: 1rem;
   }
 
-  #couponsCount,
   #couponsSortContainer,
   #addCouponButton {
     margin-top: 0.5rem;
@@ -454,6 +525,18 @@ li {
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  appearance: textfield;
 }
 
 .hidden {

@@ -12,10 +12,10 @@
   <body>
     <header>
       <select id="sectionSelector">
-        <option selected value="cupons">Cupons</option>
-        <option value="configuracoes">Configurações</option>
+        <option selected value="coupons">Cupons</option>
+        <option value="inactive">Inativos</option>
+        <option value="settings">Configurações</option>
       </select>
-      <h2 id="headerTitle">Cupons</h2>
       <div id="logoutButton" class="defaultButton cancelButton">Sair</div>
     </header>
     <main>
@@ -24,10 +24,10 @@
           <div id="couponsSortContainer">
             <select id="couponsSort">
               <option value="code">Código</option>
-              <option selected value="created">Adicionado em</option>
-              <option value="expired">Expira em</option>
-              <option value="redirects">Acessos</option>
               <option value="uses">Utilizações</option>
+              <option value="expired">Validade</option>
+              <option value="redirects">Acessos</option>
+              <option selected value="created">Registro</option>
             </select>
             <svg
               id="arrowUp"
@@ -53,16 +53,16 @@
             </svg>
           </div>
           <div class="headerText countContainer">
+            <p>Cupons:</p>
             <p id="couponsCount">00</p>
-            <p>Cupons</p>
           </div>
           <div class="headerText countContainer">
-            <p id="redirectsCount">00</p>
-            <p>Acessos</p>
-          </div>
-          <div class="headerText countContainer">
+            <p>Utilizações:</p>
             <p id="usesCount">00</p>
-            <p>Utilizações</p>
+          </div>
+          <div class="headerText countContainer">
+            <p>Acessos:</p>
+            <p id="redirectsCount">00</p>
           </div>
           <div id="addCouponButton" class="defaultButton primaryButton">
             ADICIONAR
@@ -71,35 +71,54 @@
         <div class="listContainer">
           <ul id="couponsList">
             <li id="liItemTemplate" class="hidden">
-              <svg
-                id="editButton"
-                class="liIcon"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-              >
+              <!-- <svg -->
+                <!-- id="editButton" -->
+                <!-- class="liIcon" -->
+                <!-- xmlns="http://www.w3.org/2000/svg" -->
+                <!-- viewBox="0 0 512 512" -->
+              <!-- > -->
                 <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-                <path
-                  d="M144 272L128 384l112-16L436.7 171.3l-96-96L144 272zM512 96L416 0 363.3 52.7l96 96L512 96zM32 64H0V96 480v32H32 416h32V480 320 288H384v32V448H64V128H192h32V64H192 32z"
-                />
-              </svg>
+                <!-- <path -->
+                  <!-- d="M144 272L128 384l112-16L436.7 171.3l-96-96L144 272zM512 96L416 0 363.3 52.7l96 96L512 96zM32 64H0V96 480v32H32 416h32V480 320 288H384v32V448H64V128H192h32V64H192 32z" -->
+                <!-- /> -->
+              <!-- </svg> -->
               <div class="liContent">
                 <p id="liID">1</p>
-                <p id="liTextCode" class="liTextBig">CUPOM-01</p>
-                <div class="liTextDateContainer">
-                  <p class="liTextDateText">Adicionado em:</p>
-                  <p id="liTextDateCreated" class="liTextDate">04/11/2022</p>
-                </div>
-                <div class="liTextDateContainer">
-                  <p class="liTextDateText">Expira em:</p>
-                  <p id="liTextDateExpired" class="liTextDate">05/11/2022</p>
-                </div>
-                <div class="liTextDateContainer">
-                  <p class="liTextDateText">Acessos:</p>
-                  <p id="liTextRedirects" class="liTextDate">15</p>
-                </div>
+                <input
+                  id="liTextCode"
+                  class="liTextBig editCouponInput listCouponInput"
+                />
                 <div class="liTextUsesContainer">
                   <p class="liTextDateText">Utilizações:</p>
-                  <p id="liTextUses" class="liTextBig">10</p>
+                  <input
+                    id="liTextUses"
+                    class="liTextBig editCouponInput listCouponInput"
+                    type="number"
+                    min="0"
+                    step="1"
+                  />
+                </div>
+                <div class="liTextDateContainer">
+                  <p class="liTextDateText">Validade:</p>
+                  <input
+                    id="liTextDateExpired"
+                    class="liTextDate editCouponInput listCouponInput"
+                    type="date"
+                  />
+                </div>
+                <div class="liTextUsesContainer">
+                  <p class="liTextDateText">Acessos:</p>
+                  <input
+                    id="liTextRedirects"
+                    class="liTextBig editCouponInput listCouponInput cursorDefault"
+                    type="number"
+                    disabled
+                  />
+                </div>
+                <div class="liTextDateContainer">
+                  <p class="liTextDateText">Registro:</p>
+                  <input id="liTextDateCreated" class="liTextDate editCouponInput listCouponInput cursorDefault"
+                  type="date" disabled></input>
                 </div>
               </div>
               <svg
@@ -117,14 +136,69 @@
           </ul>
         </div>
       </div>
-      <div id="configSection" class="section hidden">Configurações</div>
+      <div id="configSection" class="section hidden">
+        <div class="configContainer">
+          <div class="configLine">
+            <p class="configText">Máximo de utilizações por cupom:</p>
+            <input
+              id="configCouponUses"
+              class="editCouponInput configInput"
+              type="number"
+              step="1"
+              min="1"
+              max="999"
+            />
+          </div>
+          <div class="configLine">
+            <p class="configText">Visitas para consumo de utilização:</p>
+            <input
+              id="configRedirectsPerUse"
+              class="editCouponInput configInput"
+              type="number"
+              step="1"
+              min="1"
+              max="999"
+            />
+          </div>
+          <div class="configLine">
+            <p class="configText">Utilizações restantes para destaque:</p>
+            <input
+              id="configAlertRemainingUses"
+              class="editCouponInput configInput"
+              type="number"
+              step="1"
+              min="1"
+              max="999"
+            />
+          </div>
+          <div class="configLine">
+            <p class="configText">Dias de validade:</p>
+            <input
+              id="configExpiredDays"
+              class="editCouponInput configInput"
+              type="number"
+              step="1"
+              min="1"
+              max="999"
+            />
+          </div>
+          <div class="configLine">
+            <div id="configResetButton" class="defaultButton cancelButton">
+              Redefinir
+            </div>
+            <div id="configUpdateButton" class="defaultButton saveButton">
+              Atualizar
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
     <div id="modalBackground" class="hidden"></div>
     <div id="modalContainer" class="hidden">
       <div id="editModal" class="modalWindow">
         <input id="editCouponCode" class="editCouponInput" required />
         <div class="modalLine">
-          <p class="modalText">Adicionado em:</p>
+          <p class="modalText">Registro:</p>
           <input
             id="editCouponCreated"
             class="editCouponInput"
@@ -133,7 +207,7 @@
           />
         </div>
         <div class="modalLine">
-          <p class="modalText">Expira em:</p>
+          <p class="modalText">Validade:</p>
           <input id="editCouponExpired" class="editCouponInput" type="date" />
         </div>
         <div class="modalLine">
@@ -162,8 +236,8 @@
           <div id="modalEditCancelButton" class="defaultButton cancelButton">
             Cancelar
           </div>
-          <div id="modalSaveButton" class="defaultButton saveButton">
-            Atualizar
+          <div id="modalSaveButton" class="defaultButton primaryButton">
+            Adicionar
           </div>
         </div>
       </div>

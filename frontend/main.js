@@ -3,7 +3,6 @@ const backendURL = "http://localhost:3000";
 const sectionSelector = document.getElementById("sectionSelector");
 const listSection = document.getElementById("listSection");
 const configSection = document.getElementById("configSection");
-const headerTitle = document.getElementById("headerTitle");
 const liItemTemplate = document.getElementById("liItemTemplate");
 const couponsSort = document.getElementById("couponsSort");
 const arrowUp = document.getElementById("arrowUp");
@@ -27,9 +26,23 @@ const addCouponButton = document.getElementById("addCouponButton");
 const couponsCount = document.getElementById("couponsCount");
 const usesCount = document.getElementById("usesCount");
 const redirectsCount = document.getElementById("redirectsCount");
+const configCouponUses = document.getElementById("configCouponUses");
+const configRedirectsPerUse = document.getElementById("configRedirectsPerUse");
+const configAlertRemainingUses = document.getElementById(
+  "configAlertRemainingUses"
+);
+const configExpiredDays = document.getElementById("configExpiredDays");
+const configResetButton = document.getElementById("configResetButton");
+const configUpdateButton = document.getElementById("configUpdateButton");
 
 const couponsList = document.getElementById("couponsList");
 let coupons = [];
+let configs = {
+  couponUses: 0,
+  redirectsPerUse: 0,
+  alertRemainingUses: 0,
+  expiredDays: 0,
+};
 let sort = "created";
 let sortASC = -1;
 let selectedCoupon;
@@ -43,26 +56,92 @@ modalRemoveCancelButton.addEventListener("click", hideModal);
 modalSaveButton.addEventListener("click", updateCoupon);
 modalRemoveButton.addEventListener("click", deleteCoupon);
 addCouponButton.addEventListener("click", showEditModal);
+configResetButton.addEventListener("click", resetConfigs);
+configUpdateButton.addEventListener("click", updateConfigs);
 
-function changeSection(e) {
+async function changeSection(e) {
   switch (e.target.value) {
-    case "cupons":
+    case "coupons":
       showListSection();
+      await getCouponsActive();
+      populateCouponsList();
       break;
-    case "configuracoes":
+    case "inactive":
+      showListSection();
+      await getCouponsInactive();
+      populateCouponsList();
+      break;
+    case "settings":
       showConfigSection();
+      await getConfigs();
       break;
   }
 }
 
-async function updateCoupon() {
-  if (selectedCoupon && editCouponCode.value) {
-    selectedCoupon.code = editCouponCode.value;
-    selectedCoupon.expired = editCouponExpired.value
-      ? new Date(editCouponExpired.value)
-      : null;
-    selectedCoupon.uses = editCouponUses.value;
+async function resetConfigs() {
+  await getConfigs();
+  populateConfigs();
+}
 
+async function updateConfigs() {
+  if (validateConfigsForm()) {
+    const defaultHeader = new Headers();
+    defaultHeader.append("Content-Type", "application/json");
+    const requestConfigs = [];
+    requestConfigs.push({
+      description: "alertRemainingUses",
+      value: configAlertRemainingUses.value,
+    });
+    requestConfigs.push({
+      description: "couponUses",
+      value: configCouponUses.value,
+    });
+    requestConfigs.push({
+      description: "expiredDays",
+      value: configExpiredDays.value,
+    });
+    requestConfigs.push({
+      description: "redirectsPerUse",
+      value: configRedirectsPerUse.value,
+    });
+    const requestJSON = JSON.stringify(requestConfigs);
+
+    const requestOptions = {
+      method: "PUT",
+      headers: defaultHeader,
+      body: requestJSON,
+      redirect: "follow",
+    };
+
+    fetch(`${backendURL}/configs/update?apiKey=1234`, requestOptions)
+      .then(async (response) => {
+        window.alert("Configurações atualizadas!");
+        await getConfigs();
+        populateConfigs();
+      })
+      .catch(async (error) => {
+        window.alert("Ocorreu um erro na atualização!");
+        await getConfigs();
+        populateConfigs();
+      });
+  }
+}
+
+function validateConfigsForm() {
+  return (
+    configAlertRemainingUses.value &&
+    configCouponUses.value &&
+    configExpiredDays.value &&
+    configRedirectsPerUse.value &&
+    (configAlertRemainingUses.value != configs.alertRemainingUses ||
+      configCouponUses.value != configs.couponUses ||
+      configExpiredDays.value != configs.expiredDays ||
+      configRedirectsPerUse.value != configs.redirectsPerUse)
+  );
+}
+
+async function updateCoupon() {
+  if (selectedCoupon) {
     const defaultHeader = new Headers();
     defaultHeader.append("Content-Type", "application/json");
     const requestJSON = JSON.stringify(selectedCoupon);
@@ -78,7 +157,7 @@ async function updateCoupon() {
       `${backendURL}/coupons/update?apiKey=1234`,
       requestOptions
     );
-  } else if (editCouponCode.value) {
+  } else {
     selectedCoupon = {};
     selectedCoupon.code = editCouponCode.value;
     selectedCoupon.created = new Date(editCouponCreated.value);
@@ -103,18 +182,13 @@ async function updateCoupon() {
       `${backendURL}/coupons/add?apiKey=1234`,
       requestOptions
     );
-  } else {
-    !editCouponCode.classList.contains("requiredField")
-      ? editCouponCode.classList.add("requiredField")
-      : null;
-    return;
+    hideModal();
+    await getCouponsActive();
+    sortCoupons();
+    populateCouponsList();
+    editCouponCode.classList.remove("requiredField");
   }
 
-  editCouponCode.classList.remove("requiredField");
-  hideModal();
-  await getCoupons();
-  sortCoupons();
-  populateCouponsList();
   selectedCoupon = null;
 }
 
@@ -136,7 +210,7 @@ async function deleteCoupon() {
   );
 
   hideModal();
-  await getCoupons();
+  await getCouponsActive();
   sortCoupons();
   populateCouponsList();
   selectedCoupon = null;
@@ -225,7 +299,7 @@ function sortCoupons() {
 }
 
 function showListSection() {
-  headerTitle.innerText = "Cupons";
+  // headerTitle.innerText = "Cupons";
   listSection.classList.contains("hidden")
     ? listSection.classList.remove("hidden")
     : null;
@@ -235,7 +309,7 @@ function showListSection() {
 }
 
 function showConfigSection() {
-  headerTitle.innerText = "Configurações";
+  // headerTitle.innerText = "Configurações";
   configSection.classList.contains("hidden")
     ? configSection.classList.remove("hidden")
     : null;
@@ -244,15 +318,35 @@ function showConfigSection() {
     : null;
 }
 
-async function getCoupons() {
+async function getCouponsActive() {
   coupons = [];
-  const result = await fetch(`${backendURL}/coupons/all?apiKey=1234`);
+  const result = await fetch(`${backendURL}/coupons/active?apiKey=1234`);
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
     item.expired = item.expired ? new Date(item.expired) : null;
     coupons.push(item);
   }
+}
+
+async function getCouponsInactive() {
+  coupons = [];
+  const result = await fetch(`${backendURL}/coupons/inactive?apiKey=1234`);
+  const resultJSON = await result.json();
+  for (const item of resultJSON) {
+    item.created = new Date(item.created);
+    item.expired = item.expired ? new Date(item.expired) : null;
+    coupons.push(item);
+  }
+}
+
+async function getConfigs() {
+  const result = await fetch(`${backendURL}/configs/all?apiKey=1234`);
+  const resultJSON = await result.json();
+  configs.alertRemainingUses = resultJSON[0].value;
+  configs.couponUses = resultJSON[1].value;
+  configs.expiredDays = resultJSON[2].value;
+  configs.redirectsPerUse = resultJSON[3].value;
 }
 
 function populateCouponsList() {
@@ -270,27 +364,36 @@ function populateCouponsList() {
     const newItem = liItemTemplate.cloneNode(true);
     newItem.classList.remove("hidden");
     newItem.querySelector("#liID").innerText = coupon.id;
-    newItem.querySelector("#liTextCode").innerText = `${coupon.code}`;
-    if (coupon.uses > 40) {
+    newItem.querySelector("#liTextCode").value = `${coupon.code}`;
+
+    if (coupon.uses < configs.alertRemainingUses) {
       !newItem.querySelector("#liTextCode").classList.contains("textDanger")
         ? newItem.querySelector("#liTextCode").classList.add("textDanger")
         : null;
     } else {
       newItem.querySelector("#liTextCode").classList.remove("textDanger");
     }
-    newItem.querySelector("#liTextDateCreated").innerText = `${formatDateBR(
+    newItem
+      .querySelector("#liTextCode")
+      .addEventListener("keypress", changeCodeValue);
+    newItem
+      .querySelector("#liTextCode")
+      .addEventListener("focusout", changeCodeValue);
+    newItem.querySelector("#liTextDateCreated").value = `${formatDateUS(
       coupon.created
     )}`;
-    newItem.querySelector("#liTextDateExpired").innerText = `${
-      coupon.expired ? formatDateBR(coupon.expired) : ""
+    newItem.querySelector("#liTextDateExpired").value = `${
+      coupon.expired ? formatDateUS(coupon.expired) : ""
     }`;
-    newItem.querySelector("#liTextRedirects").innerText = `${coupon.redirects
-      .toString()
-      .padStart(2, "0")}`;
-    newItem.querySelector("#liTextUses").innerText = `${coupon.uses
-      .toString()
-      .padStart(2, "0")}`;
-    if (coupon.uses > 40) {
+    newItem
+      .querySelector("#liTextDateExpired")
+      .addEventListener("keypress", changeExpiredValue);
+    newItem
+      .querySelector("#liTextDateExpired")
+      .addEventListener("focusout", changeExpiredValue);
+    newItem.querySelector("#liTextRedirects").value = `${coupon.redirects}`;
+    newItem.querySelector("#liTextUses").value = `${coupon.uses}`;
+    if (coupon.uses < configs.alertRemainingUses) {
       !newItem.querySelector("#liTextUses").classList.contains("textDanger")
         ? newItem.querySelector("#liTextUses").classList.add("textDanger")
         : null;
@@ -298,26 +401,95 @@ function populateCouponsList() {
       newItem.querySelector("#liTextUses").classList.remove("textDanger");
     }
     newItem
-      .querySelector("#editButton")
-      .addEventListener("click", showEditModal);
+      .querySelector("#liTextUses")
+      .addEventListener("keypress", changeUsesValue);
+    newItem
+      .querySelector("#liTextUses")
+      .addEventListener("focusout", changeUsesValue);
+    // newItem
+    //   .querySelector("#editButton")
+    //   .addEventListener("click", showEditModal);
     newItem
       .querySelector("#removeButton")
       .addEventListener("click", showRemoveModal);
+
+    if (!coupon.active) {
+      newItem.querySelector("#liTextCode").disabled = true;
+      newItem.querySelector("#liTextCode").classList.remove("cursorPointer");
+      newItem.querySelector("#liTextCode").classList.add("cursorDefault");
+      newItem.querySelector("#liTextUses").disabled = true;
+      newItem.querySelector("#liTextUses").classList.remove("cursorPointer");
+      newItem.querySelector("#liTextUses").classList.add("cursorDefault");
+      newItem.querySelector("#liTextDateExpired").disabled = true;
+      newItem
+        .querySelector("#liTextDateExpired")
+        .classList.remove("cursorPointer");
+      newItem
+        .querySelector("#liTextDateExpired")
+        .classList.add("cursorDefault");
+    }
     couponsList.appendChild(newItem);
+  }
+}
+
+function changeUsesValue(e) {
+  if ((e && e.key && e.keyCode == 13) || !e.key) {
+    e.preventDefault();
+    const itemID =
+      e.target.parentElement.parentElement.querySelector("#liID").textContent;
+    for (const coupon of coupons) {
+      if (coupon.id == itemID) {
+        selectedCoupon = coupon;
+        break;
+      }
+    }
+    if (selectedCoupon.uses != e.target.value) {
+      selectedCoupon.uses = e.target.value;
+      updateCoupon();
+    }
+  }
+}
+
+function changeExpiredValue(e) {
+  if ((e && e.key && e.keyCode == 13) || !e.key) {
+    e.preventDefault();
+    const itemID =
+      e.target.parentElement.parentElement.querySelector("#liID").textContent;
+    for (const coupon of coupons) {
+      if (coupon.id == itemID) {
+        selectedCoupon = coupon;
+        break;
+      }
+    }
+    if (
+      e.target.value &&
+      formatDateUS(selectedCoupon.expired) != e.target.value
+    ) {
+      selectedCoupon.expired = new Date(e.target.value);
+      updateCoupon();
+    }
+  }
+}
+
+function changeCodeValue(e) {
+  if ((e && e.key && e.keyCode == 13) || !e.key) {
+    e.preventDefault();
+    const itemID = e.target.parentElement.querySelector("#liID").textContent;
+    for (const coupon of coupons) {
+      if (coupon.id == itemID) {
+        selectedCoupon = coupon;
+        break;
+      }
+    }
+    if (selectedCoupon.code != e.target.value) {
+      selectedCoupon.code = e.target.value;
+      updateCoupon();
+    }
   }
 }
 
 function showEditModal(e) {
   editCouponCode.classList.remove("requiredField");
-  let itemID;
-  e.stopPropagation();
-  if (e.target.tagName == "svg") {
-    itemID = e.target.parentElement.querySelector("#liID").textContent;
-  }
-  if (e.target.tagName == "path") {
-    itemID =
-      e.target.parentElement.parentElement.querySelector("#liID").textContent;
-  }
 
   modalBackground.classList.contains("hidden")
     ? modalBackground.classList.remove("hidden")
@@ -332,35 +504,14 @@ function showEditModal(e) {
     ? removeModal.classList.add("hidden")
     : null;
 
-  if (itemID) {
-    selectCoupon(itemID);
-    editCouponCode.value = selectedCoupon.code;
-    editCouponCreated.value = formatDateUS(selectedCoupon.created);
-    editCouponExpired.value = selectedCoupon.expired
-      ? formatDateUS(selectedCoupon.expired)
-      : null;
-    editCouponRedirects.value = selectedCoupon.redirects;
-    editCouponUses.value = selectedCoupon.uses;
-    modalSaveButton.innerText = "Atualizar";
-    modalSaveButton.classList.remove("primaryButton");
-    !modalSaveButton.classList.contains("saveButton")
-      ? modalSaveButton.classList.add("saveButton")
-      : null;
-  } else {
-    selectedCoupon = null;
-    editCouponCode.value = "";
-    editCouponCreated.value = formatDateUS(new Date());
-    editCouponExpired.value = null;
-    editCouponRedirects.value = 0;
-    editCouponUses.value = 0;
-    modalSaveButton.innerText = "Adicionar";
-    !modalSaveButton.classList.contains("primaryButton")
-      ? modalSaveButton.classList.add("primaryButton")
-      : null;
-    modalSaveButton.classList.contains("saveButton")
-      ? modalSaveButton.classList.remove("saveButton")
-      : null;
-  }
+  selectedCoupon = null;
+  editCouponCode.value = "";
+  editCouponCreated.value = formatDateUS(new Date());
+  const expiredDate = new Date();
+  expiredDate.setDate(expiredDate.getDate() + configs.expiredDays);
+  editCouponExpired.value = formatDateUS(expiredDate);
+  editCouponRedirects.value = 0;
+  editCouponUses.value = configs.couponUses;
   editCouponCode.focus();
 }
 
@@ -402,21 +553,40 @@ function selectCoupon(id) {
 }
 
 function formatDateBR(date) {
-  return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}/${date.getFullYear()}`;
+  if (Object.prototype.toString.call(date) === "[object Date]") {
+    return `${date.getDate().toString().padStart(2, "0")}/${(
+      date.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}/${date.getFullYear()}`;
+  } else {
+    return null;
+  }
 }
 
 function formatDateUS(date) {
-  return `${date.getFullYear()}-${(date.getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  if (Object.prototype.toString.call(date) === "[object Date]") {
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  } else {
+    return null;
+  }
 }
 
 async function startup() {
-  await getCoupons();
+  await getCouponsActive();
+  await getConfigs();
   sortCoupons();
   populateCouponsList();
+  populateConfigs();
+}
+
+function populateConfigs() {
+  configCouponUses.value = configs.couponUses;
+  configRedirectsPerUse.value = configs.redirectsPerUse;
+  configAlertRemainingUses.value = configs.alertRemainingUses;
+  configExpiredDays.value = configs.expiredDays;
 }
 
 startup();
