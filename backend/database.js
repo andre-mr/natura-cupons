@@ -1,4 +1,5 @@
 const mysql = require("mysql2/promise.js");
+var crypto = require("crypto");
 
 async function addCoupon(coupon) {
   return await sqlInsert(
@@ -10,9 +11,51 @@ async function addCoupon(coupon) {
       coupon.redirects,
       formatDateTime(coupon.created),
       0,
-      1,
+      coupon.active,
     ]
   );
+}
+
+async function login(apikey) {
+  const user = await checkUser(apikey);
+  if (user && user.length > 0) {
+    return true;
+  } else {
+    const userExists = await checkUserAny();
+    if (userExists && userExists.length > 0) {
+      return false;
+    } else {
+      return await createUser(apikey);
+    }
+  }
+}
+
+async function checkUserAny() {
+  return sqlSelect(
+    `SELECT * 
+    FROM user;`
+  );
+}
+
+async function checkUser(apikey) {
+  const hashkey = crypto.createHash("md5").update(apikey).digest("hex");
+  return sqlSelect(
+    `SELECT * 
+    FROM user WHERE apikey = '${hashkey}' 
+    ORDER BY id ASC;`
+  );
+}
+
+async function createUser(apikey) {
+  const hashkey = crypto.createHash("md5").update(apikey).digest("hex");
+  return await sqlInsert(`INSERT INTO user (apikey) VALUES (?) `, [hashkey]);
+}
+
+async function updateApikey(apikey) {
+  const hashkey = crypto.createHash("md5").update(apikey.value).digest("hex");
+  let sql = `UPDATE user SET apikey=? WHERE id > 0 `;
+  let values = [hashkey];
+  return await sqlUpdateOrDelete(sql, values);
 }
 
 async function getCouponsActive() {
@@ -144,4 +187,7 @@ module.exports = {
   deleteCoupon,
   getConfigs,
   updateConfigs,
+  login,
+  updateApikey,
+  checkUser,
 };

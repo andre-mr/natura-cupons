@@ -75,6 +75,32 @@ app.get("/", async (req, res) => {
   res.send();
 });
 
+app.use(async (req, res, next) => {
+  if (req.query.apikey) {
+    const user = await database.login(req.query.apikey);
+    if (user) {
+      next();
+    } else {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.write(JSON.stringify(["apikey!"]));
+      res.send();
+    }
+  } else {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.write(JSON.stringify(["apikey!"]));
+    res.send();
+  }
+});
+
+app.get("/login", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.login(req.query.apikey)));
+  res.send();
+});
+
 app.get("/coupons/active", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -114,6 +140,13 @@ app.put("/configs/update", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.write(JSON.stringify(await database.updateConfigs(req.body)));
+  res.send();
+});
+
+app.put("/login/update", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await database.updateApikey(req.body)));
   res.send();
 });
 

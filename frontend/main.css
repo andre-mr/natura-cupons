@@ -63,25 +63,16 @@ li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* padding: 0.5rem; */
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
 
 input {
-  /* background-color: whitesmoke; */
   cursor: pointer;
 }
 
-/* #headerTitle {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  font-size: larger;
-} */
-
-#liTextCode {
+.liTextCode {
   width: 30%;
   display: flex;
   justify-content: start;
@@ -93,23 +84,54 @@ input {
   font-weight: bold;
 }
 
-#liTextUses {
+.liTextUses {
   text-align: center;
 }
 
-#liTextDateExpired,
-#liTextDateCreated {
+.liTextDateExpired,
+.liTextDateCreated {
   align-self: center;
   width: 80%;
   text-align: center;
 }
 
-#liTextDateExpired {
+.liTextDateExpired {
   font-weight: bold;
 }
 
-#liTextDateCreated::-webkit-calendar-picker-indicator {
+.liTextDateCreated::-webkit-calendar-picker-indicator {
   display: none;
+}
+
+#apikeySection {
+  justify-content: center;
+}
+
+#apikeyInput {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 200px;
+  padding: 0.5rem;
+}
+
+#apikeyLabel {
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: large;
+}
+
+#apikeyCheckbox {
+  width: 15px;
+  height: 15px;
+  margin-right: 1rem;
+}
+
+#loginButton {
+  margin-top: 2rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .cursorPointer {
@@ -124,15 +146,11 @@ input {
   margin-bottom: 4rem;
 }
 
-#liID {
+.liID {
   display: none;
 }
 
-/* #editButton {
-  fill: orange;
-} */
-
-#removeButton {
+.removeButton {
   fill: red;
 }
 
@@ -212,7 +230,6 @@ input {
 }
 
 #editCouponCode {
-  /* text-transform: uppercase; */
   text-align: center;
   font-weight: bold;
   width: 60%;
@@ -226,6 +243,10 @@ input {
 
 #editCouponUses {
   width: 60px;
+}
+
+#apikeyText {
+  color: #ff6b0b;
 }
 
 .listCouponInput {
@@ -275,7 +296,6 @@ input {
   display: flex;
   justify-content: center;
   width: 100%;
-  /* margin-bottom: 0.5rem; */
 }
 
 .liTextDate {
@@ -435,96 +455,10 @@ input {
 .configInput {
   font-size: large;
   font-weight: bold;
-  width: 60px;
+  width: 70px;
 }
 
 @media only screen and (max-width: 768px) {
-  li {
-    width: 90%;
-  }
-
-  .liContent {
-    flex-direction: column;
-  }
-
-  .liTextDateContainer {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .liTextDateText {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 1rem;
-    margin-top: 0.2rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .liTextDate {
-    display: flex;
-    justify-content: start;
-    font-size: medium;
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-
-  .liTextUses {
-    width: 100%;
-    display: flex;
-    justify-content: start;
-    font-size: larger;
-    margin-left: 1rem;
-    margin-right: 1rem;
-    margin-top: 1rem;
-  }
-
-  .liIcon {
-    height: 50px;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    cursor: pointer;
-  }
-
-  #listSectionHeader {
-    flex-direction: column;
-    margin-bottom: 1rem;
-  }
-
-  #couponsSortContainer,
-  #addCouponButton {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .modalWindow {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    border-radius: 0.3rem;
-    width: 90%;
-    height: 60%;
-  }
-
-  .modalLine {
-    width: 80%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  #modalEditCancelButton,
-  #modalSaveButton,
-  #modalRemoveButton {
-    height: 40px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
 }
 
 /* Chrome, Safari, Edge, Opera */

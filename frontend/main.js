@@ -34,8 +34,14 @@ const configAlertRemainingUses = document.getElementById(
 const configExpiredDays = document.getElementById("configExpiredDays");
 const configResetButton = document.getElementById("configResetButton");
 const configUpdateButton = document.getElementById("configUpdateButton");
-
 const couponsList = document.getElementById("couponsList");
+const apikeyInput = document.getElementById("apikeyInput");
+const apikeyCheckbox = document.getElementById("apikeyCheckbox");
+const apikeySection = document.getElementById("apikeySection");
+const logoutButton = document.getElementById("logoutButton");
+const loginButton = document.getElementById("loginButton");
+const configApikey = document.getElementById("configApikey");
+
 let coupons = [];
 let configs = {
   couponUses: 0,
@@ -43,9 +49,10 @@ let configs = {
   alertRemainingUses: 0,
   expiredDays: 0,
 };
-let sort = "created";
+let sort = "uses";
 let sortASC = -1;
 let selectedCoupon;
+let apikey;
 
 sectionSelector.addEventListener("change", changeSection);
 couponsSort.addEventListener("change", changeCouponsSort);
@@ -58,6 +65,50 @@ modalRemoveButton.addEventListener("click", deleteCoupon);
 addCouponButton.addEventListener("click", showEditModal);
 configResetButton.addEventListener("click", resetConfigs);
 configUpdateButton.addEventListener("click", updateConfigs);
+apikeyInput.addEventListener("keypress", userLogin);
+loginButton.addEventListener("click", userLogin);
+logoutButton.addEventListener("click", userLogout);
+editCouponCode.addEventListener("keypress", updateCoupon);
+
+async function autoLogin() {
+  apikey = localStorage.getItem("apikey");
+  if (apikey) {
+    const loginResult = await login();
+    if (loginResult) {
+      startup();
+    } else {
+      window.alert("Senha inválida!");
+    }
+  }
+  apikeyInput.focus();
+}
+
+async function userLogin(e) {
+  if (e && ((e.key && e.keyCode == 13) || !e.key)) {
+    apikey = apikeyInput.value;
+    const loginResult = await login();
+    if (loginResult == true) {
+      if (apikeyCheckbox.checked) {
+        localStorage.setItem("apikey", apikey);
+      }
+      startup();
+    } else {
+      apikeyInput.value = null;
+      window.alert("Senha inválida!");
+    }
+  }
+}
+
+async function userLogout() {
+  apikey = null;
+  localStorage.removeItem("apikey");
+  window.location.reload();
+}
+
+async function login() {
+  const result = await fetch(`${backendURL}/login?apikey=${apikey}`);
+  return await result.json();
+}
 
 async function changeSection(e) {
   switch (e.target.value) {
@@ -84,9 +135,36 @@ async function resetConfigs() {
 }
 
 async function updateConfigs() {
+  const defaultHeader = new Headers();
+  defaultHeader.append("Content-Type", "application/json");
+
+  if (configApikey.value && configApikey.value != apikey) {
+    const requestJSON = JSON.stringify({ value: configApikey.value });
+
+    const requestOptions = {
+      method: "PUT",
+      headers: defaultHeader,
+      body: requestJSON,
+      redirect: "follow",
+    };
+
+    fetch(`${backendURL}/login/update?apikey=${apikey}`, requestOptions)
+      .then(async (response) => {
+        window.alert("Configurações atualizadas!");
+        apikey = configApikey.value;
+        configApikey.value = null;
+        localStorage.setItem("apikey", apikey);
+        await getConfigs();
+        populateConfigs();
+      })
+      .catch(async (error) => {
+        window.alert("Ocorreu um erro na atualização!");
+        await getConfigs();
+        populateConfigs();
+      });
+  }
+
   if (validateConfigsForm()) {
-    const defaultHeader = new Headers();
-    defaultHeader.append("Content-Type", "application/json");
     const requestConfigs = [];
     requestConfigs.push({
       description: "alertRemainingUses",
@@ -113,7 +191,7 @@ async function updateConfigs() {
       redirect: "follow",
     };
 
-    fetch(`${backendURL}/configs/update?apiKey=1234`, requestOptions)
+    fetch(`${backendURL}/configs/update?apikey=${apikey}`, requestOptions)
       .then(async (response) => {
         window.alert("Configurações atualizadas!");
         await getConfigs();
@@ -140,56 +218,64 @@ function validateConfigsForm() {
   );
 }
 
-async function updateCoupon() {
-  if (selectedCoupon) {
-    const defaultHeader = new Headers();
-    defaultHeader.append("Content-Type", "application/json");
-    const requestJSON = JSON.stringify(selectedCoupon);
+async function updateCoupon(e) {
+  if ((e && e.key && e.keyCode == 13) || !e) {
+    if (selectedCoupon) {
+      const defaultHeader = new Headers();
+      defaultHeader.append("Content-Type", "application/json");
+      const requestJSON = JSON.stringify(selectedCoupon);
 
-    const requestOptions = {
-      method: "PUT",
-      headers: defaultHeader,
-      body: requestJSON,
-      redirect: "follow",
-    };
+      const requestOptions = {
+        method: "PUT",
+        headers: defaultHeader,
+        body: requestJSON,
+        redirect: "follow",
+      };
 
-    const result = await fetch(
-      `${backendURL}/coupons/update?apiKey=1234`,
-      requestOptions
-    );
-  } else {
-    selectedCoupon = {};
-    selectedCoupon.code = editCouponCode.value;
-    selectedCoupon.created = new Date(editCouponCreated.value);
-    selectedCoupon.expired = editCouponExpired.value
-      ? new Date(editCouponExpired.value)
-      : null;
-    selectedCoupon.redirects = editCouponRedirects.value;
-    selectedCoupon.uses = editCouponUses.value;
+      const result = await fetch(
+        `${backendURL}/coupons/update?apikey=${apikey}`,
+        requestOptions
+      );
+    } else {
+      selectedCoupon = {};
+      selectedCoupon.code = editCouponCode.value;
+      selectedCoupon.created = new Date(editCouponCreated.value);
+      selectedCoupon.expired = editCouponExpired.value
+        ? new Date(editCouponExpired.value)
+        : null;
+      selectedCoupon.redirects = editCouponRedirects.value;
+      selectedCoupon.uses = editCouponUses.value;
+      const today = new Date();
+      if (selectedCoupon.expired < today) {
+        selectedCoupon.active = 0;
+      } else {
+        selectedCoupon.active = 1;
+      }
 
-    const defaultHeader = new Headers();
-    defaultHeader.append("Content-Type", "application/json");
-    const requestJSON = JSON.stringify(selectedCoupon);
+      const defaultHeader = new Headers();
+      defaultHeader.append("Content-Type", "application/json");
+      const requestJSON = JSON.stringify(selectedCoupon);
 
-    const requestOptions = {
-      method: "POST",
-      headers: defaultHeader,
-      body: requestJSON,
-      redirect: "follow",
-    };
+      const requestOptions = {
+        method: "POST",
+        headers: defaultHeader,
+        body: requestJSON,
+        redirect: "follow",
+      };
 
-    const result = await fetch(
-      `${backendURL}/coupons/add?apiKey=1234`,
-      requestOptions
-    );
-    hideModal();
-    await getCouponsActive();
-    sortCoupons();
-    populateCouponsList();
-    editCouponCode.classList.remove("requiredField");
+      const result = await fetch(
+        `${backendURL}/coupons/add?apikey=${apikey}`,
+        requestOptions
+      );
+      hideModal();
+      await getCouponsActive();
+      sortCoupons();
+      populateCouponsList();
+      editCouponCode.classList.remove("requiredField");
+    }
+
+    selectedCoupon = null;
   }
-
-  selectedCoupon = null;
 }
 
 async function deleteCoupon() {
@@ -205,7 +291,7 @@ async function deleteCoupon() {
   };
 
   const result = await fetch(
-    `${backendURL}/coupons/delete?apiKey=1234`,
+    `${backendURL}/coupons/delete?apikey=${apikey}`,
     requestOptions
   );
 
@@ -299,7 +385,6 @@ function sortCoupons() {
 }
 
 function showListSection() {
-  // headerTitle.innerText = "Cupons";
   listSection.classList.contains("hidden")
     ? listSection.classList.remove("hidden")
     : null;
@@ -309,7 +394,6 @@ function showListSection() {
 }
 
 function showConfigSection() {
-  // headerTitle.innerText = "Configurações";
   configSection.classList.contains("hidden")
     ? configSection.classList.remove("hidden")
     : null;
@@ -320,7 +404,7 @@ function showConfigSection() {
 
 async function getCouponsActive() {
   coupons = [];
-  const result = await fetch(`${backendURL}/coupons/active?apiKey=1234`);
+  const result = await fetch(`${backendURL}/coupons/active?apikey=${apikey}`);
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
@@ -331,7 +415,7 @@ async function getCouponsActive() {
 
 async function getCouponsInactive() {
   coupons = [];
-  const result = await fetch(`${backendURL}/coupons/inactive?apiKey=1234`);
+  const result = await fetch(`${backendURL}/coupons/inactive?apikey=${apikey}`);
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
@@ -341,7 +425,7 @@ async function getCouponsInactive() {
 }
 
 async function getConfigs() {
-  const result = await fetch(`${backendURL}/configs/all?apiKey=1234`);
+  const result = await fetch(`${backendURL}/configs/all?apikey=${apikey}`);
   const resultJSON = await result.json();
   configs.alertRemainingUses = resultJSON[0].value;
   configs.couponUses = resultJSON[1].value;
@@ -363,69 +447,66 @@ function populateCouponsList() {
   for (const coupon of coupons) {
     const newItem = liItemTemplate.cloneNode(true);
     newItem.classList.remove("hidden");
-    newItem.querySelector("#liID").innerText = coupon.id;
-    newItem.querySelector("#liTextCode").value = `${coupon.code}`;
+    newItem.querySelector(".liID").innerText = coupon.id;
+    newItem.querySelector(".liTextCode").value = `${coupon.code}`;
 
     if (coupon.uses < configs.alertRemainingUses) {
-      !newItem.querySelector("#liTextCode").classList.contains("textDanger")
-        ? newItem.querySelector("#liTextCode").classList.add("textDanger")
+      !newItem.querySelector(".liTextCode").classList.contains("textDanger")
+        ? newItem.querySelector(".liTextCode").classList.add("textDanger")
         : null;
     } else {
-      newItem.querySelector("#liTextCode").classList.remove("textDanger");
+      newItem.querySelector(".liTextCode").classList.remove("textDanger");
     }
     newItem
-      .querySelector("#liTextCode")
+      .querySelector(".liTextCode")
       .addEventListener("keypress", changeCodeValue);
     newItem
-      .querySelector("#liTextCode")
+      .querySelector(".liTextCode")
       .addEventListener("focusout", changeCodeValue);
-    newItem.querySelector("#liTextDateCreated").value = `${formatDateUS(
+    newItem.querySelector(".liTextDateCreated").value = `${formatDateUS(
       coupon.created
     )}`;
-    newItem.querySelector("#liTextDateExpired").value = `${
+    newItem.querySelector(".liTextDateExpired").value = `${
       coupon.expired ? formatDateUS(coupon.expired) : ""
     }`;
     newItem
-      .querySelector("#liTextDateExpired")
+      .querySelector(".liTextDateExpired")
       .addEventListener("keypress", changeExpiredValue);
     newItem
-      .querySelector("#liTextDateExpired")
+      .querySelector(".liTextDateExpired")
       .addEventListener("focusout", changeExpiredValue);
-    newItem.querySelector("#liTextRedirects").value = `${coupon.redirects}`;
-    newItem.querySelector("#liTextUses").value = `${coupon.uses}`;
+    newItem.querySelector(".liTextRedirects").value = `${coupon.redirects}`;
+    newItem.querySelector(".liTextUses").value = `${coupon.uses}`;
     if (coupon.uses < configs.alertRemainingUses) {
-      !newItem.querySelector("#liTextUses").classList.contains("textDanger")
-        ? newItem.querySelector("#liTextUses").classList.add("textDanger")
+      !newItem.querySelector(".liTextUses").classList.contains("textDanger")
+        ? newItem.querySelector(".liTextUses").classList.add("textDanger")
         : null;
     } else {
-      newItem.querySelector("#liTextUses").classList.remove("textDanger");
+      newItem.querySelector(".liTextUses").classList.remove("textDanger");
     }
     newItem
-      .querySelector("#liTextUses")
+      .querySelector(".liTextUses")
       .addEventListener("keypress", changeUsesValue);
     newItem
-      .querySelector("#liTextUses")
+      .querySelector(".liTextUses")
       .addEventListener("focusout", changeUsesValue);
-    // newItem
-    //   .querySelector("#editButton")
-    //   .addEventListener("click", showEditModal);
     newItem
-      .querySelector("#removeButton")
+      .querySelector(".removeButton")
       .addEventListener("click", showRemoveModal);
 
     if (!coupon.active) {
-      newItem.querySelector("#liTextCode").disabled = true;
-      newItem.querySelector("#liTextCode").classList.remove("cursorPointer");
-      newItem.querySelector("#liTextCode").classList.add("cursorDefault");
-      newItem.querySelector("#liTextUses").disabled = true;
-      newItem.querySelector("#liTextUses").classList.remove("cursorPointer");
-      newItem.querySelector("#liTextUses").classList.add("cursorDefault");
-      newItem.querySelector("#liTextDateExpired").disabled = true;
+      newItem.querySelector(".liTextCode").disabled = true;
+      newItem.querySelector(".liTextCode").classList.remove("cursorPointer");
+      newItem.querySelector(".liTextCode").classList.add("cursorDefault");
+      newItem.querySelector(".liTextUses").disabled = true;
+      newItem.querySelector(".liTextUses").classList.remove("cursorPointer");
+      newItem.querySelector(".liTextUses").classList.add("cursorDefault");
+      newItem.querySelector(".liTextDateExpired").disabled = true;
       newItem
-        .querySelector("#liTextDateExpired")
+        .querySelector(".liTextDateExpired")
         .classList.remove("cursorPointer");
       newItem
-        .querySelector("#liTextDateExpired")
+        .querySelector(".liTextDateExpired")
         .classList.add("cursorDefault");
     }
     couponsList.appendChild(newItem);
@@ -436,7 +517,7 @@ function changeUsesValue(e) {
   if ((e && e.key && e.keyCode == 13) || !e.key) {
     e.preventDefault();
     const itemID =
-      e.target.parentElement.parentElement.querySelector("#liID").textContent;
+      e.target.parentElement.parentElement.querySelector(".liID").textContent;
     for (const coupon of coupons) {
       if (coupon.id == itemID) {
         selectedCoupon = coupon;
@@ -454,7 +535,7 @@ function changeExpiredValue(e) {
   if ((e && e.key && e.keyCode == 13) || !e.key) {
     e.preventDefault();
     const itemID =
-      e.target.parentElement.parentElement.querySelector("#liID").textContent;
+      e.target.parentElement.parentElement.querySelector(".liID").textContent;
     for (const coupon of coupons) {
       if (coupon.id == itemID) {
         selectedCoupon = coupon;
@@ -474,7 +555,7 @@ function changeExpiredValue(e) {
 function changeCodeValue(e) {
   if ((e && e.key && e.keyCode == 13) || !e.key) {
     e.preventDefault();
-    const itemID = e.target.parentElement.querySelector("#liID").textContent;
+    const itemID = e.target.parentElement.querySelector(".liID").textContent;
     for (const coupon of coupons) {
       if (coupon.id == itemID) {
         selectedCoupon = coupon;
@@ -519,11 +600,11 @@ function showRemoveModal(e) {
   let itemID;
   e.stopPropagation();
   if (e.target.tagName == "svg") {
-    itemID = e.target.parentElement.querySelector("#liID").textContent;
+    itemID = e.target.parentElement.querySelector(".liID").textContent;
   }
   if (e.target.tagName == "path") {
     itemID =
-      e.target.parentElement.parentElement.querySelector("#liID").textContent;
+      e.target.parentElement.parentElement.querySelector(".liID").textContent;
   }
   selectCoupon(itemID);
 
@@ -575,6 +656,9 @@ function formatDateUS(date) {
 }
 
 async function startup() {
+  document.getElementById("apikeySection").classList.add("hidden");
+  document.getElementById("headerSection").classList.remove("hidden");
+  document.getElementById("mainSection").classList.remove("hidden");
   await getCouponsActive();
   await getConfigs();
   sortCoupons();
@@ -589,4 +673,4 @@ function populateConfigs() {
   configExpiredDays.value = configs.expiredDays;
 }
 
-startup();
+autoLogin();

@@ -10,7 +10,7 @@
     <script defer src="main.js"></script>
   </head>
   <body>
-    <header>
+    <header id="headerSection" class="hidden">
       <select id="sectionSelector">
         <option selected value="coupons">Cupons</option>
         <option value="inactive">Inativos</option>
@@ -18,16 +18,17 @@
       </select>
       <div id="logoutButton" class="defaultButton cancelButton">Sair</div>
     </header>
-    <main>
+
+    <main id="mainSection" class="hidden">
       <div id="listSection" class="section">
         <div id="listSectionHeader">
           <div id="couponsSortContainer">
             <select id="couponsSort">
               <option value="code">Código</option>
-              <option value="uses">Utilizações</option>
+              <option selected value="uses">Disponíveis</option>
               <option value="expired">Validade</option>
               <option value="redirects">Acessos</option>
-              <option selected value="created">Registro</option>
+              <option value="created">Registro</option>
             </select>
             <svg
               id="arrowUp"
@@ -71,59 +72,43 @@
         <div class="listContainer">
           <ul id="couponsList">
             <li id="liItemTemplate" class="hidden">
-              <!-- <svg -->
-                <!-- id="editButton" -->
-                <!-- class="liIcon" -->
-                <!-- xmlns="http://www.w3.org/2000/svg" -->
-                <!-- viewBox="0 0 512 512" -->
-              <!-- > -->
-                <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-                <!-- <path -->
-                  <!-- d="M144 272L128 384l112-16L436.7 171.3l-96-96L144 272zM512 96L416 0 363.3 52.7l96 96L512 96zM32 64H0V96 480v32H32 416h32V480 320 288H384v32V448H64V128H192h32V64H192 32z" -->
-                <!-- /> -->
-              <!-- </svg> -->
               <div class="liContent">
-                <p id="liID">1</p>
+                <p class="liID">1</p>
                 <input
-                  id="liTextCode"
-                  class="liTextBig editCouponInput listCouponInput"
+                  class="liTextCode liTextBig editCouponInput listCouponInput"
                 />
                 <div class="liTextUsesContainer">
-                  <p class="liTextDateText">Utilizações:</p>
+                  <p class="liTextDateText">Disponíveis</p>
                   <input
-                    id="liTextUses"
-                    class="liTextBig editCouponInput listCouponInput"
+                    class="liTextUses liTextBig editCouponInput listCouponInput"
                     type="number"
                     min="0"
                     step="1"
                   />
                 </div>
                 <div class="liTextDateContainer">
-                  <p class="liTextDateText">Validade:</p>
+                  <p class="liTextDateText">Validade</p>
                   <input
-                    id="liTextDateExpired"
-                    class="liTextDate editCouponInput listCouponInput"
+                    class="liTextDateExpired liTextDate editCouponInput listCouponInput"
                     type="date"
                   />
                 </div>
                 <div class="liTextUsesContainer">
-                  <p class="liTextDateText">Acessos:</p>
+                  <p class="liTextDateText">Acessos</p>
                   <input
-                    id="liTextRedirects"
-                    class="liTextBig editCouponInput listCouponInput cursorDefault"
+                    class="liTextRedirects liTextBig editCouponInput listCouponInput cursorDefault"
                     type="number"
                     disabled
                   />
                 </div>
                 <div class="liTextDateContainer">
-                  <p class="liTextDateText">Registro:</p>
-                  <input id="liTextDateCreated" class="liTextDate editCouponInput listCouponInput cursorDefault"
+                  <p class="liTextDateText">Registro</p>
+                  <input class="liTextDateCreated liTextDate editCouponInput listCouponInput cursorDefault"
                   type="date" disabled></input>
                 </div>
               </div>
               <svg
-                id="removeButton"
-                class="liIcon"
+                class="removeButton liIcon"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
               >
@@ -183,6 +168,14 @@
             />
           </div>
           <div class="configLine">
+            <p class="configText">Alterar senha:</p>
+            <input
+              id="configApikey"
+              class="editCouponInput configInput"
+              type="password"
+            />
+          </div>
+          <div class="configLine">
             <div id="configResetButton" class="defaultButton cancelButton">
               Redefinir
             </div>
@@ -193,7 +186,9 @@
         </div>
       </div>
     </main>
+
     <div id="modalBackground" class="hidden"></div>
+
     <div id="modalContainer" class="hidden">
       <div id="editModal" class="modalWindow">
         <input id="editCouponCode" class="editCouponInput" required />
@@ -253,6 +248,16 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div id="apikeySection" class="section">
+      <h1 id="apikeyText">Senha:</h1>
+      <input id="apikeyInput" class="editCouponInput listCouponInput" type="password"/>
+      <div id="apikeyLabel">
+        <input id="apikeyCheckbox" type="checkbox" value="apikeyCheckbox"/>
+        <label for="apikeyCheckbox">Salvar senha</label>
+      </div>
+      <div id="loginButton" class="defaultButton primaryButton">Entrar</div>
     </div>
   </body>
 </html>
