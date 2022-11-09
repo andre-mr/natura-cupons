@@ -3,21 +3,30 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Natura Redirect</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google" content="notranslate" />
+    <title>Natura Redirect</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
 
     <style>
       * {
         margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
       }
 
       html,
       body {
         height: 100%;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
 
-      .title {
+      #title {
+        text-align: center;
+        color: #ff6b0b;
         width: 100%;
         display: flex;
         justify-content: center;
@@ -31,24 +40,62 @@
         align-items: center;
         justify-content: center;
       }
-    </style>
 
-    <script>
-      window.onload = () => {
-        setTimeout(() => {
-          location.href = "https://google.com";
-          // location.assign("https://google.com");
-          // location.replace("https://google.com");
-          // location = "https://google.com";
-          // window.open("https://google.com", "_self");
-        }, 5000);
-      };
-    </script>
+      .code {
+        font-weight: bold;
+        font-size: x-large;
+        background-color: #f4ab34;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        padding: 1.5rem;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
   </head>
 
   <body>
     <div class="main">
-      <h1 class="title">Texto (Redirecionando)...</h1>
+      <h1 id="title">Copiar e ir:</h1>
+      <br />
+      <div id="couponCode" class="code" onclick="copyToClipboard()">Código</div>
     </div>
+
+    <script>
+      const apiURL = "http://localhost:3000";
+      const myURL = "http://127.0.0.1:5500/redirect/index.html";
+
+      const params = new URL(document.location).searchParams;
+      const targetURL = params.get("url");
+
+      let couponCode;
+
+      async function getCoupon() {
+        if (targetURL) {
+          const result = await fetch(apiURL);
+          couponCode = await result.json();
+          document.getElementById("couponCode").innerText = couponCode;
+          document.getElementById("couponCode").classList.remove("hidden");
+        } else {
+          document.getElementById("couponCode").classList.add("hidden");
+          document.getElementById("title").innerText =
+            "Erro, contate o divulgador.";
+        }
+      }
+
+      async function copyToClipboard() {
+        await navigator.clipboard.writeText(couponCode);
+        location.replace(targetURL);
+      }
+
+      function startup() {
+        getCoupon();
+        console.log(targetURL);
+      }
+
+      startup();
+    </script>
   </body>
 </html>

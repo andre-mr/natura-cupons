@@ -26,12 +26,16 @@ const addCouponButton = document.getElementById("addCouponButton");
 const couponsCount = document.getElementById("couponsCount");
 const usesCount = document.getElementById("usesCount");
 const redirectsCount = document.getElementById("redirectsCount");
-const configCouponUses = document.getElementById("configCouponUses");
-const configRedirectsPerUse = document.getElementById("configRedirectsPerUse");
 const configAlertRemainingUses = document.getElementById(
   "configAlertRemainingUses"
 );
+const configAutoUpdateInterval = document.getElementById(
+  "configAutoUpdateInterval"
+);
+const configCouponUses = document.getElementById("configCouponUses");
+const configRedirectsPerUse = document.getElementById("configRedirectsPerUse");
 const configExpiredDays = document.getElementById("configExpiredDays");
+const configApikey = document.getElementById("configApikey");
 const configResetButton = document.getElementById("configResetButton");
 const configUpdateButton = document.getElementById("configUpdateButton");
 const couponsList = document.getElementById("couponsList");
@@ -40,24 +44,26 @@ const apikeyCheckbox = document.getElementById("apikeyCheckbox");
 const apikeySection = document.getElementById("apikeySection");
 const logoutButton = document.getElementById("logoutButton");
 const loginButton = document.getElementById("loginButton");
-const configApikey = document.getElementById("configApikey");
 
 let coupons = [];
 let configs = {
   couponUses: 0,
   redirectsPerUse: 0,
   alertRemainingUses: 0,
+  autoUpdateInterval: 0,
   expiredDays: 0,
 };
 let sort = "uses";
-let sortASC = -1;
+let sortASC = 1;
 let selectedCoupon;
 let apikey;
+let autoUpdateTimer = 0;
+let autoUpdateRunning = false;
 
 sectionSelector.addEventListener("change", changeSection);
 couponsSort.addEventListener("change", changeCouponsSort);
-arrowUp.addEventListener("click", toggleSort);
-arrowDown.addEventListener("click", toggleSort);
+arrowUp.addEventListener("click", toggleSortOrder);
+arrowDown.addEventListener("click", toggleSortOrder);
 modalEditCancelButton.addEventListener("click", hideModal);
 modalRemoveCancelButton.addEventListener("click", hideModal);
 modalSaveButton.addEventListener("click", updateCoupon);
@@ -69,6 +75,32 @@ apikeyInput.addEventListener("keypress", userLogin);
 loginButton.addEventListener("click", userLogin);
 logoutButton.addEventListener("click", userLogout);
 editCouponCode.addEventListener("keypress", updateCoupon);
+
+const autoUpdateLoop = setInterval(async () => {
+  if (autoUpdateRunning) {
+    if (autoUpdateTimer <= 0) {
+      await getCouponsActive();
+      sortCoupons();
+      populateCouponsList();
+      resetAutoUpdateTimer();
+    } else {
+      autoUpdateTimer--;
+    }
+  }
+}, 1000);
+
+function resetAutoUpdateTimer() {
+  autoUpdateTimer = configs.autoUpdateInterval * 60;
+}
+
+async function highlightChange(element) {
+  if (!element.classList.contains("highlight")) {
+    element.classList.add("highlight");
+    setTimeout(() => {
+      element.classList.remove("highlight");
+    }, 500);
+  }
+}
 
 async function autoLogin() {
   apikey = localStorage.getItem("apikey");
@@ -116,15 +148,20 @@ async function changeSection(e) {
       showListSection();
       await getCouponsActive();
       populateCouponsList();
+      sortCoupons();
+      autoUpdateRunning = true;
       break;
     case "inactive":
       showListSection();
       await getCouponsInactive();
       populateCouponsList();
+      sortCoupons();
+      autoUpdateRunning = false;
       break;
     case "settings":
       showConfigSection();
       await getConfigs();
+      autoUpdateRunning = false;
       break;
   }
 }
@@ -171,6 +208,10 @@ async function updateConfigs() {
       value: configAlertRemainingUses.value,
     });
     requestConfigs.push({
+      description: "autoUpdateInterval",
+      value: configAutoUpdateInterval.value,
+    });
+    requestConfigs.push({
       description: "couponUses",
       value: configCouponUses.value,
     });
@@ -208,10 +249,12 @@ async function updateConfigs() {
 function validateConfigsForm() {
   return (
     configAlertRemainingUses.value &&
+    configAutoUpdateInterval.value &&
     configCouponUses.value &&
     configExpiredDays.value &&
     configRedirectsPerUse.value &&
     (configAlertRemainingUses.value != configs.alertRemainingUses ||
+      configAutoUpdateInterval.value != configs.autoUpdateInterval ||
       configCouponUses.value != configs.couponUses ||
       configExpiredDays.value != configs.expiredDays ||
       configRedirectsPerUse.value != configs.redirectsPerUse)
@@ -219,7 +262,7 @@ function validateConfigsForm() {
 }
 
 async function updateCoupon(e) {
-  if ((e && e.key && e.keyCode == 13) || !e) {
+  if ((e && e.key && e.keyCode == 13) || !e || !e.key) {
     if (selectedCoupon) {
       const defaultHeader = new Headers();
       defaultHeader.append("Content-Type", "application/json");
@@ -311,7 +354,7 @@ function hideModal() {
     : null;
 }
 
-function toggleSort() {
+function toggleSortOrder() {
   arrowDown.classList.toggle("hidden");
   arrowUp.classList.toggle("hidden");
   sortASC = -sortASC;
@@ -427,10 +470,7 @@ async function getCouponsInactive() {
 async function getConfigs() {
   const result = await fetch(`${backendURL}/configs/all?apikey=${apikey}`);
   const resultJSON = await result.json();
-  configs.alertRemainingUses = resultJSON[0].value;
-  configs.couponUses = resultJSON[1].value;
-  configs.expiredDays = resultJSON[2].value;
-  configs.redirectsPerUse = resultJSON[3].value;
+  configs = JSON.parse(JSON.stringify(resultJSON));
 }
 
 function populateCouponsList() {
@@ -449,8 +489,11 @@ function populateCouponsList() {
     newItem.classList.remove("hidden");
     newItem.querySelector(".liID").innerText = coupon.id;
     newItem.querySelector(".liTextCode").value = `${coupon.code}`;
+    if (coupon.skips > 0) {
+      newItem.querySelector(".liTextCode").classList.add("highlightCurrent");
+    }
 
-    if (coupon.uses < configs.alertRemainingUses) {
+    if (coupon.uses <= configs.alertRemainingUses) {
       !newItem.querySelector(".liTextCode").classList.contains("textDanger")
         ? newItem.querySelector(".liTextCode").classList.add("textDanger")
         : null;
@@ -475,7 +518,9 @@ function populateCouponsList() {
     newItem
       .querySelector(".liTextDateExpired")
       .addEventListener("focusout", changeExpiredValue);
-    newItem.querySelector(".liTextRedirects").value = `${coupon.redirects}`;
+    newItem.querySelector(".liTextRedirects").value = `${
+      coupon.redirects >= 0 ? coupon.redirects : 0
+    }`;
     newItem.querySelector(".liTextUses").value = `${coupon.uses}`;
     if (coupon.uses < configs.alertRemainingUses) {
       !newItem.querySelector(".liTextUses").classList.contains("textDanger")
@@ -526,6 +571,7 @@ function changeUsesValue(e) {
     }
     if (selectedCoupon.uses != e.target.value) {
       selectedCoupon.uses = e.target.value;
+      highlightChange(e.target);
       updateCoupon();
     }
   }
@@ -547,6 +593,7 @@ function changeExpiredValue(e) {
       formatDateUS(selectedCoupon.expired) != e.target.value
     ) {
       selectedCoupon.expired = new Date(e.target.value);
+      highlightChange(e.target);
       updateCoupon();
     }
   }
@@ -564,6 +611,7 @@ function changeCodeValue(e) {
     }
     if (selectedCoupon.code != e.target.value) {
       selectedCoupon.code = e.target.value;
+      highlightChange(e.target);
       updateCoupon();
     }
   }
@@ -659,17 +707,21 @@ async function startup() {
   document.getElementById("apikeySection").classList.add("hidden");
   document.getElementById("headerSection").classList.remove("hidden");
   document.getElementById("mainSection").classList.remove("hidden");
-  await getCouponsActive();
   await getConfigs();
+  await getCouponsActive();
+  populateConfigs();
   sortCoupons();
   populateCouponsList();
-  populateConfigs();
+  window.addEventListener("keypress", resetAutoUpdateTimer);
+  resetAutoUpdateTimer();
+  autoUpdateRunning = true;
 }
 
 function populateConfigs() {
   configCouponUses.value = configs.couponUses;
   configRedirectsPerUse.value = configs.redirectsPerUse;
   configAlertRemainingUses.value = configs.alertRemainingUses;
+  configAutoUpdateInterval.value = configs.autoUpdateInterval;
   configExpiredDays.value = configs.expiredDays;
 }
 

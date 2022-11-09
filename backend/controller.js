@@ -1,6 +1,67 @@
 const mysql = require("mysql2/promise.js");
 var crypto = require("crypto");
 
+async function chooseRedirectCoupon() {
+  const configs = await getConfigs();
+  const coupons = await getCouponsActive();
+
+  if (coupons.length <= 0) {
+    return null;
+  }
+
+  let lastCoupon = coupons[0];
+  let nextCoupon = null;
+  let targetCoupon = null;
+
+  for (let i = 0; i < coupons.length; i++) {
+    if (coupons[i].skips > 0) {
+      lastCoupon = coupons[i];
+      if (lastCoupon.skips < configs.redirectsPerUse) {
+        lastCoupon.skips++;
+        lastCoupon.redirects++;
+        targetCoupon = lastCoupon;
+        updateCoupon(targetCoupon);
+        break;
+      } else {
+        lastCoupon.skips = 0;
+        if (lastCoupon.uses <= 0) {
+          lastCoupon.active = 0;
+        }
+        if (coupons[i + 1]) {
+          nextCoupon = coupons[i + 1];
+        } else {
+          nextCoupon = coupons[0];
+        }
+        nextCoupon.skips++;
+        nextCoupon.uses--;
+        nextCoupon.redirects++;
+        targetCoupon = nextCoupon;
+        updateCoupon(lastCoupon);
+        updateCoupon(targetCoupon);
+        break;
+      }
+    }
+  }
+
+  if (targetCoupon) {
+    return targetCoupon.code;
+  } else {
+    targetCoupon = lastCoupon;
+    if (targetCoupon.skips >= configs.redirectsPerUse) {
+      targetCoupon.skips = 1;
+    } else {
+      targetCoupon.skips++;
+    }
+    targetCoupon.uses--;
+    if (targetCoupon.uses <= 0) {
+      targetCoupon.active = 0;
+    }
+    targetCoupon.redirects++;
+    updateCoupon(targetCoupon);
+    return targetCoupon.code;
+  }
+}
+
 async function addCoupon(coupon) {
   return await sqlInsert(
     `INSERT INTO coupon (code, uses, expired, redirects, created, skips, active) VALUES (?) `,
@@ -80,6 +141,12 @@ async function getCouponsInactive() {
 }
 
 async function updateCoupon(coupon) {
+  if (coupon.created instanceof Date) {
+    coupon.created = coupon.created.toISOString();
+  }
+  if (coupon.expired instanceof Date) {
+    coupon.expired = coupon.expired.toISOString();
+  }
   let sql = `UPDATE coupon SET code=?, uses=?, expired=?, redirects=?, created=?, skips=?, active=? WHERE id=? `;
   let values = [
     coupon.code,
@@ -101,11 +168,42 @@ async function deleteCoupon(coupon) {
 }
 
 async function getConfigs() {
-  return sqlSelect(
+  let configs = await sqlSelect(
     `SELECT * 
     FROM configs 
     ORDER BY description ASC;`
   );
+
+  if (configs.length <= 0) {
+    configsArray = [];
+    configsArray.push(["alertRemainingUses", 5]);
+    configsArray.push(["autoUpdateInterval", 5]);
+    configsArray.push(["couponUses", 50]);
+    configsArray.push(["expiredDays", 30]);
+    configsArray.push(["redirectsPerUse", 5]);
+
+    await addConfigs(configsArray);
+
+    configs = [];
+    for (let i = 0; i < configsArray.length; i++) {
+      configs.push({
+        description: configsArray[i][0],
+        value: configsArray[i][1],
+      });
+    }
+  }
+
+  const configsOBJ = {};
+  for (let i = 0; i < configs.length; i++) {
+    configsOBJ[configs[i].description] = configs[i].value;
+  }
+  return configsOBJ;
+}
+
+async function addConfigs(configs) {
+  return await sqlInsert(`INSERT INTO configs (description, value) VALUES ? `, [
+    ...configs,
+  ]);
 }
 
 async function updateConfigs(configs) {
@@ -190,4 +288,5 @@ module.exports = {
   login,
   updateApikey,
   checkUser,
+  chooseRedirectCoupon,
 };

@@ -80,7 +80,7 @@ input {
   align-self: center;
   margin-left: 1rem;
   margin-right: 1rem;
-  padding: 1rem;
+  padding: 1rem !important;
   font-weight: bold;
 }
 
@@ -247,6 +247,20 @@ input {
 
 #apikeyText {
   color: #ff6b0b;
+}
+
+#configLineButtons {
+  justify-content: space-evenly;
+}
+
+.highlight {
+  background-color: lightgreen;
+  filter: brightness(150%);
+}
+
+.highlightCurrent {
+  font-size: larger !important;
+  color: green;
 }
 
 .listCouponInput {
@@ -439,9 +453,9 @@ input {
   font-size: large;
   border-radius: 0.3rem;
   box-shadow: 2px 2px 6px gray;
-  width: 40%;
+  width: 50%;
   margin-top: 1rem;
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -459,6 +473,58 @@ input {
 }
 
 @media only screen and (max-width: 768px) {
+  #listSectionHeader {
+    flex-direction: column;
+  }
+  .headerText {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .modalWindow {
+    width: 95%;
+  }
+  .modalButtons {
+    width: 100%;
+    justify-content: space-evenly;
+  }
+
+  .configLine {
+    width: 80%;
+  }
+
+  li {
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+  .liContent {
+    flex-direction: column;
+    align-items: center;
+  }
+  .liTextDateText {
+    margin-top: 1rem;
+  }
+  .liTextUsesContainer {
+    width: 100%;
+  }
+  .listCouponInput {
+    width: 20%;
+  }
+  .liTextDateContainer {
+    width: 50%;
+  }
+  .liTextDate {
+    width: 100%;
+  }
+  .liTextCode {
+    width: 80%;
+    margin-top: 1rem;
+    padding: 0.5rem !important;
+  }
+  svg {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 /* Chrome, Safari, Edge, Opera */

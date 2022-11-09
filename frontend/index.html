@@ -58,7 +58,7 @@
             <p id="couponsCount">00</p>
           </div>
           <div class="headerText countContainer">
-            <p>Utilizações:</p>
+            <p>Disponíveis:</p>
             <p id="usesCount">00</p>
           </div>
           <div class="headerText countContainer">
@@ -103,8 +103,11 @@
                 </div>
                 <div class="liTextDateContainer">
                   <p class="liTextDateText">Registro</p>
-                  <input class="liTextDateCreated liTextDate editCouponInput listCouponInput cursorDefault"
-                  type="date" disabled></input>
+                  <input
+                    class="liTextDateCreated liTextDate editCouponInput listCouponInput cursorDefault"
+                    type="date"
+                    disabled
+                  />
                 </div>
               </div>
               <svg
@@ -124,7 +127,7 @@
       <div id="configSection" class="section hidden">
         <div class="configContainer">
           <div class="configLine">
-            <p class="configText">Máximo de utilizações por cupom:</p>
+            <p class="configText">Saldo padrão para novos cupons:</p>
             <input
               id="configCouponUses"
               class="editCouponInput configInput"
@@ -135,7 +138,7 @@
             />
           </div>
           <div class="configLine">
-            <p class="configText">Visitas para consumo de utilização:</p>
+            <p class="configText">Visitas para consumo de 1 utilização:</p>
             <input
               id="configRedirectsPerUse"
               class="editCouponInput configInput"
@@ -146,7 +149,7 @@
             />
           </div>
           <div class="configLine">
-            <p class="configText">Utilizações restantes para destaque:</p>
+            <p class="configText">Saldo mínimo individual para alerta:</p>
             <input
               id="configAlertRemainingUses"
               class="editCouponInput configInput"
@@ -157,9 +160,20 @@
             />
           </div>
           <div class="configLine">
-            <p class="configText">Dias de validade:</p>
+            <p class="configText">Dias de validade para novos cupons:</p>
             <input
               id="configExpiredDays"
+              class="editCouponInput configInput"
+              type="number"
+              step="1"
+              min="1"
+              max="999"
+            />
+          </div>
+          <div class="configLine">
+            <p class="configText">Minutos para atualização da página:</p>
+            <input
+              id="configAutoUpdateInterval"
               class="editCouponInput configInput"
               type="number"
               step="1"
@@ -175,7 +189,7 @@
               type="password"
             />
           </div>
-          <div class="configLine">
+          <div id="configLineButtons" class="configLine">
             <div id="configResetButton" class="defaultButton cancelButton">
               Redefinir
             </div>
@@ -252,9 +266,13 @@
 
     <div id="apikeySection" class="section">
       <h1 id="apikeyText">Senha:</h1>
-      <input id="apikeyInput" class="editCouponInput listCouponInput" type="password"/>
+      <input
+        id="apikeyInput"
+        class="editCouponInput listCouponInput"
+        type="password"
+      />
       <div id="apikeyLabel">
-        <input id="apikeyCheckbox" type="checkbox" value="apikeyCheckbox"/>
+        <input id="apikeyCheckbox" type="checkbox" value="apikeyCheckbox" />
         <label for="apikeyCheckbox">Salvar senha</label>
       </div>
       <div id="loginButton" class="defaultButton primaryButton">Entrar</div>
