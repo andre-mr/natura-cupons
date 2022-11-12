@@ -1,7 +1,5 @@
 // replace with real domain
 const apiURL = "http://localhost:3000";
-// replace with real domain
-const thisURL = "http://127.0.0.1:5500/redirect/index.html";
 
 class PageConfigs {
   backgroundColor = "FFFFFF";
