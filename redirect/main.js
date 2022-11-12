@@ -22,7 +22,7 @@ const codeButton = document.getElementById("codeButton");
 const goButton = document.getElementById("goButton");
 
 goButton.addEventListener("click", goProduct);
-codeButton.addEventListener("click", copyCode);
+codeButton.addEventListener("click", goProduct);
 
 async function getCoupon() {
   if (targetURL) {
@@ -64,8 +64,8 @@ async function startup() {
   if (!targetURL) {
     targetURL = "https://www.natura.com.br";
   }
-  await getCoupon();
   await getPageConfigs();
+  await getCoupon();
   applyPageConfigs();
 }
 
