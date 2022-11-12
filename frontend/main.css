@@ -467,7 +467,7 @@ input {
   flex-wrap: wrap;
 }
 #pagePreviewGoButton {
-  background-color: #f4ab34;
+  background-color: white;
 }
 #pagePreviewCodeButton {
   background-color: #fff;
@@ -518,6 +518,7 @@ input {
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
+  border-radius: 0.5rem;
   margin-bottom: 2rem;
 }
 #pageConfigsBottomContainer {
@@ -532,6 +533,7 @@ input {
   box-shadow: 2px 2px 8px gray;
   width: 60%;
   align-items: center;
+  border-radius: 0.5rem;
 }
 #pageConfigsRightContainer {
   background-color: whitesmoke;
@@ -542,6 +544,7 @@ input {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  border-radius: 0.5rem;
 }
 .pageConfigsPadding {
   display: flex;

@@ -4,7 +4,6 @@
 
 html,
 body {
-  /* background-color: lightgreen; */
   margin: 0;
   padding: 0;
   height: 100%;
@@ -58,7 +57,7 @@ main {
 }
 
 #goButton {
-  background-color: #f4ab34;
+  background-color: white;
 }
 
 #codeButton {

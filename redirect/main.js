@@ -38,7 +38,7 @@ async function getCoupon() {
 }
 
 async function getPageConfigs() {
-  const result = await fetch(`http://localhost:3000/configs/page`);
+  const result = await fetch(`${apiURL}/configs/page`);
   const resultJSON = await result.json();
   pageConfigs = JSON.parse(JSON.stringify(resultJSON));
 }
