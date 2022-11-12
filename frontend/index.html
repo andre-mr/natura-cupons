@@ -15,6 +15,7 @@
         <option selected value="coupons">Cupons</option>
         <option value="inactive">Inativos</option>
         <option value="settings">Configurações</option>
+        <option value="page">Página</option>
       </select>
       <div id="logoutButton" class="defaultButton cancelButton">Sair</div>
     </header>
@@ -32,7 +33,7 @@
             </select>
             <svg
               id="arrowUp"
-              class="arrowIcon"
+              class="arrowIcon hidden"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 576 512"
             >
@@ -43,7 +44,7 @@
             </svg>
             <svg
               id="arrowDown"
-              class="arrowIcon hidden"
+              class="arrowIcon"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 576 512"
             >
@@ -195,6 +196,108 @@
             </div>
             <div id="configUpdateButton" class="defaultButton saveButton">
               Atualizar
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="pageSection" class="hidden">
+        <div id="pageConfigs">
+          <div id="pageConfigTitle" class="liTextBig text">
+            Configurações da Página do Cliente
+          </div>
+          <div id="pageConfigsImageLine">
+            <p class="pageConfigText pageConfigPadding">Imagem:</p>
+            <input
+              id="pageConfigImageSelector"
+              class="editCouponInput pageConfigPadding"
+              type="file"
+              accept="image/*"
+            />
+          </div>
+          <div id="pageConfigsBottomContainer">
+            <div
+              id="pageConfigsLeftContainer"
+              class="pageConfigLine pageConfigLineTall"
+            >
+              <p class="pageConfigText pageConfigPadding">Texto principal:</p>
+              <textarea
+                id="pageConfigText"
+                class="editCouponInput pageConfigPadding"
+                maxlength="120"
+              ></textarea>
+            </div>
+            <div id="pageConfigsRightContainer">
+              <div class="pageConfigLine pageConfigLineTall">
+                <p class="pageConfigText pageConfigPadding">Cor do texto:</p>
+                <input
+                  id="pageConfigTextColor"
+                  class="editCouponInput pageConfigPadding"
+                  maxlength="6"
+                  placeholder="HEX"
+                />
+              </div>
+              <div class="pageConfigLine pageConfigLineTall">
+                <p class="pageConfigText pageConfigPadding">Cor de fundo:</p>
+                <input
+                  id="pageConfigBackgroundColor"
+                  class="editCouponInput pageConfigPadding"
+                  maxlength="6"
+                  placeholder="HEX"
+                />
+              </div>
+              <div class="pageConfigLine pageConfigLineTall">
+                <p class="pageConfigText pageConfigPadding">Cor dos botões:</p>
+                <input
+                  id="pageConfigButtonColor"
+                  class="editCouponInput pageConfigPadding"
+                  maxlength="6"
+                  placeholder="HEX"
+                />
+              </div>
+            </div>
+          </div>
+          <div id="pageConfigLineButtons">
+            <div id="pageConfigResetButton" class="defaultButton cancelButton">
+              Redefinir
+            </div>
+            <div id="pageConfigUpdateButton" class="defaultButton saveButton">
+              Atualizar
+            </div>
+          </div>
+        </div>
+        <hr />
+        <div id="pagePreview">
+          <div id="pagePreviewContainer">
+            <div id="pagePreviewTopImageContainer">
+              <img
+                id="pagePreviewTopImage"
+                src="https://www.natura.com.br/logo-natura.jpeg"
+                alt="Imagem do consultor"
+              />
+            </div>
+            <div id="pagePreviewContentTextContainer">
+              <p id="pagePreviewContentText">...</p>
+            </div>
+            <div id="pagePreviewButtonsContainer">
+              <div id="pagePreviewCodeButton" class="pagePreviewButton">
+                <div id="pagePreviewCouponCodeText">CODIGO</div>
+                <svg
+                  id="pagePreviewCopyIcon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                >
+                  <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                  <path
+                    d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"
+                  />
+                </svg>
+              </div>
+              <div id="pagePreviewInstructionText">
+                Cole ou digite na sacola de compras
+              </div>
+              <div id="pagePreviewGoButton" class="pagePreviewButton">
+                Copiar e ir à loja
+              </div>
             </div>
           </div>
         </div>

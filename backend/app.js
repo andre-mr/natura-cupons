@@ -19,6 +19,13 @@ app.get("/", async (req, res) => {
   res.send();
 });
 
+app.get("/configs/page", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await controller.getPageConfigs()));
+  res.send();
+});
+
 app.use(async (req, res, next) => {
   if (req.query.apikey) {
     const user = await controller.login(req.query.apikey);
@@ -59,10 +66,10 @@ app.get("/coupons/inactive", async (req, res) => {
   res.send();
 });
 
-app.get("/configs/all", async (req, res) => {
+app.get("/configs/coupons", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await controller.getConfigs()));
+  res.write(JSON.stringify(await controller.getCouponsConfigs()));
   res.send();
 });
 
@@ -80,10 +87,17 @@ app.put("/coupons/update", async (req, res) => {
   res.send();
 });
 
-app.put("/configs/update", async (req, res) => {
+app.put("/configs/coupons/update", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await controller.updateConfigs(req.body)));
+  res.write(JSON.stringify(await controller.updateCouponsConfigs(req.body)));
+  res.send();
+});
+
+app.put("/configs/page/update", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await controller.updatePageConfigs(req.body)));
   res.send();
 });
 

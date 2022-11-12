@@ -1,0 +1,145 @@
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+  /* background-color: lightgreen; */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+#topImageContainer {
+  width: 90%;
+  height: 40%;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#contentTextContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 90%;
+  height: 30%;
+}
+
+#buttonsContainer {
+  width: 90%;
+  height: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#contentText {
+  width: 90%;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: x-large;
+  text-align: center;
+  line-height: 1.4;
+  flex-wrap: wrap;
+}
+
+#goButton {
+  background-color: #f4ab34;
+}
+
+#codeButton {
+  background-color: white;
+  border-style: dashed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+#couponCodeText {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#copyIcon {
+  position: absolute;
+  right: 0;
+  height: 40%;
+  margin-right: 1rem;
+  fill: gray;
+  display: flex;
+  justify-content: center;
+}
+
+#instructionText {
+  color: #4d4d4d;
+  width: 100%;
+  height: 20%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#topImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  object-fit: contain;
+}
+
+.button {
+  width: 100%;
+  height: 35%;
+  font-weight: bold;
+  font-size: x-large;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px lightgray;
+}
+
+.button:hover {
+  filter: brightness(110%);
+}
+
+.button:active {
+  transform: translate(2px, 2px);
+}
+
+@media only screen and (min-width: 768px) {
+  body {
+    display: flex;
+    justify-content: center;
+  }
+  main {
+    width: 60%;
+  }
+  #buttonsContainer {
+    width: 50%;
+  }
+  #topImage {
+    object-fit: contain;
+  }
+}
+
+.hidden {
+  display: none;
+}

@@ -2,8 +2,10 @@ const mysql = require("mysql2/promise.js");
 var crypto = require("crypto");
 
 async function chooseRedirectCoupon() {
-  const configs = await getConfigs();
+  const configs = await getCouponsConfigs();
   const coupons = await getCouponsActive();
+
+  if (!coupons) return null;
 
   if (coupons.length <= 0) {
     return null;
@@ -167,20 +169,32 @@ async function deleteCoupon(coupon) {
   return await sqlUpdateOrDelete(sql, values);
 }
 
-async function getConfigs() {
+async function getCouponsConfigs() {
   let configs = await sqlSelect(
-    `SELECT * 
+    `SELECT description, value 
     FROM configs 
+    WHERE type = 'coupons' 
     ORDER BY description ASC;`
   );
 
+  if (!configs) return null;
+
   if (configs.length <= 0) {
     configsArray = [];
-    configsArray.push(["alertRemainingUses", 5]);
-    configsArray.push(["autoUpdateInterval", 5]);
-    configsArray.push(["couponUses", 50]);
-    configsArray.push(["expiredDays", 30]);
-    configsArray.push(["redirectsPerUse", 5]);
+    const newConfigs = new CouponsConfigs();
+    configsArray.push([
+      "page",
+      "alertRemainingUses",
+      newConfigs.alertRemainingUses,
+    ]);
+    configsArray.push([
+      "page",
+      "autoUpdateInterval",
+      newConfigs.autoUpdateInterval,
+    ]);
+    configsArray.push(["page", "couponUses", newConfigs.couponUses]);
+    configsArray.push(["page", "expiredDays", newConfigs.expiredDays]);
+    configsArray.push(["page", "redirectsPerUse", newConfigs.redirectsPerUse]);
 
     await addConfigs(configsArray);
 
@@ -200,14 +214,61 @@ async function getConfigs() {
   return configsOBJ;
 }
 
-async function addConfigs(configs) {
-  return await sqlInsert(`INSERT INTO configs (description, value) VALUES ? `, [
-    ...configs,
-  ]);
+async function getPageConfigs() {
+  let configs = await sqlSelect(
+    `SELECT description, value 
+    FROM configs 
+    WHERE type = 'page' 
+    ORDER BY description ASC;`
+  );
+
+  if (!configs) return null;
+
+  if (configs.length <= 0) {
+    configsArray = [];
+    const newConfigs = new PageConfigs();
+    configsArray.push(["page", "backgroundColor", newConfigs.backgroundColor]);
+    configsArray.push(["page", "textColor", newConfigs.textColor]);
+    configsArray.push(["page", "buttonColor", newConfigs.buttonColor]);
+    configsArray.push(["page", "text", newConfigs.text]);
+    configsArray.push(["page", "imageB64", newConfigs.imageB64]);
+
+    await addConfigs(configsArray);
+
+    configs = [];
+    for (let i = 0; i < configsArray.length; i++) {
+      configs.push({
+        description: configsArray[i][1],
+        value: configsArray[i][2],
+      });
+    }
+  }
+
+  const configsOBJ = {};
+  for (let i = 0; i < configs.length; i++) {
+    configsOBJ[configs[i].description] = configs[i].value;
+  }
+  return configsOBJ;
 }
 
-async function updateConfigs(configs) {
-  const sql = `UPDATE configs SET value=? WHERE description=? `;
+async function addConfigs(configs) {
+  return await sqlInsert(
+    `INSERT INTO configs (type, description, value) VALUES ? `,
+    [...configs]
+  );
+}
+
+async function updateCouponsConfigs(configs) {
+  const sql = `UPDATE configs SET value=? WHERE description=? AND type='coupons'`;
+  for (const config of configs) {
+    const values = [config.value, config.description];
+    await sqlUpdateOrDelete(sql, values);
+  }
+  return true;
+}
+
+async function updatePageConfigs(configs) {
+  const sql = `UPDATE configs SET value=? WHERE description=? AND type='page'`;
   for (const config of configs) {
     const values = [config.value, config.description];
     await sqlUpdateOrDelete(sql, values);
@@ -283,10 +344,28 @@ module.exports = {
   getCouponsInactive,
   updateCoupon,
   deleteCoupon,
-  getConfigs,
-  updateConfigs,
+  getCouponsConfigs,
+  updateCouponsConfigs,
   login,
   updateApikey,
   checkUser,
   chooseRedirectCoupon,
+  getPageConfigs,
+  updatePageConfigs,
 };
+
+class CouponsConfigs {
+  alertRemainingUses = 5;
+  autoUpdateInterval = 5;
+  couponUses = 50;
+  expiredDays = 30;
+  redirectsPerUse = 5;
+}
+
+class PageConfigs {
+  backgroundColor = "FFFFFF";
+  buttonColor = "CCCCCC";
+  imageB64 = "";
+  text = "natura";
+  textColor = "000000";
+}

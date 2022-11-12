@@ -2,15 +2,13 @@
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
-
-html,
-body {
+body,
+html {
   height: 100%;
   width: 100%;
 }
-
 header {
-  color: white;
+  color: #fff;
   background-color: #ff6b0b;
   height: 6%;
   display: flex;
@@ -18,16 +16,14 @@ header {
   align-items: center;
   position: relative;
 }
-
 main {
-  height: 93%;
+  height: 94%;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
 }
-
 select {
   margin-left: 1%;
   height: 75%;
@@ -35,16 +31,14 @@ select {
   padding-left: 5px;
   padding-right: 20px;
   font-size: large;
-  font-weight: bold;
+  font-weight: 700;
   height: 80%;
   border: 0;
-  box-shadow: 2px 2px 6px lightgray;
+  box-shadow: 2px 2px 6px #d3d3d3;
 }
-
 option {
   font-size: large;
 }
-
 ul {
   width: 100%;
   padding: 0;
@@ -54,10 +48,9 @@ ul {
   justify-content: center;
   align-items: center;
 }
-
 li {
-  background-color: whitesmoke;
-  box-shadow: 2px 2px 8px darkgray;
+  background-color: #f5f5f5;
+  box-shadow: 2px 2px 8px #a9a9a9;
   width: 100%;
   list-style-type: none;
   display: flex;
@@ -67,11 +60,9 @@ li {
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
-
 input {
   cursor: pointer;
 }
-
 .liTextCode {
   width: 30%;
   display: flex;
@@ -81,39 +72,32 @@ input {
   margin-left: 1rem;
   margin-right: 1rem;
   padding: 1rem !important;
-  font-weight: bold;
+  font-weight: 700;
 }
-
 .liTextUses {
   text-align: center;
 }
-
-.liTextDateExpired,
-.liTextDateCreated {
+.liTextDateCreated,
+.liTextDateExpired {
   align-self: center;
   width: 80%;
   text-align: center;
 }
-
 .liTextDateExpired {
-  font-weight: bold;
+  font-weight: 700;
 }
-
 .liTextDateCreated::-webkit-calendar-picker-indicator {
   display: none;
 }
-
 #apikeySection {
   justify-content: center;
 }
-
 #apikeyInput {
   margin-top: 1rem;
   margin-bottom: 1rem;
   width: 200px;
   padding: 0.5rem;
 }
-
 #apikeyLabel {
   width: 200px;
   display: flex;
@@ -121,39 +105,28 @@ input {
   align-items: center;
   font-size: large;
 }
-
 #apikeyCheckbox {
   width: 15px;
   height: 15px;
   margin-right: 1rem;
 }
-
 #loginButton {
   margin-top: 2rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
-
-.cursorPointer {
-  cursor: pointer;
-}
-
 .cursorDefault {
   cursor: default;
 }
-
 #removeCouponCode {
   margin-bottom: 4rem;
 }
-
 .liID {
   display: none;
 }
-
 .removeButton {
   fill: red;
 }
-
 .section {
   height: 100%;
   width: 100%;
@@ -163,13 +136,11 @@ input {
   align-items: center;
   overflow-y: scroll;
 }
-
-#usesCount,
 #couponsCount,
-#redirectsCount {
+#redirectsCount,
+#usesCount {
   margin-left: 0.5rem;
 }
-
 #listSectionHeader {
   width: 98%;
   height: auto;
@@ -179,31 +150,27 @@ input {
   font-size: larger;
   padding-top: 1rem;
   padding-bottom: 1rem;
-  box-shadow: 2px 2px 6px lightgray;
+  box-shadow: 2px 2px 6px #d3d3d3;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
-
 #couponsSort {
   height: 100%;
   padding-top: 0.3rem;
   padding-bottom: 0.3rem;
 }
-
 #couponsSortContainer {
   display: flex;
   align-items: center;
   margin-left: 1rem;
   margin-right: 1rem;
 }
-
 #logoutButton {
   height: 60%;
-  font-weight: bold;
+  font-weight: 700;
 }
-
 #modalBackground {
-  background-color: black;
+  background-color: #000;
   opacity: 0.5;
   position: absolute;
   top: 0;
@@ -213,7 +180,6 @@ input {
   justify-content: center;
   align-items: center;
 }
-
 #modalContainer {
   position: absolute;
   top: 0;
@@ -224,50 +190,57 @@ input {
   width: 100%;
   height: 100%;
 }
-
 #removeModal {
   height: 35%;
 }
-
 #editCouponCode {
   text-align: center;
-  font-weight: bold;
+  font-weight: 700;
   width: 60%;
   margin-top: 1rem;
   margin-bottom: 2rem;
 }
-
 #editCouponRedirects {
   width: 60px;
 }
-
 #editCouponUses {
   width: 60px;
 }
-
 #apikeyText {
   color: #ff6b0b;
 }
-
 #configLineButtons {
   justify-content: space-evenly;
 }
-
-.highlight {
-  background-color: lightgreen;
-  filter: brightness(150%);
+#pageSection {
+  background-color: gray;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
-
-.highlightCurrent {
-  font-size: larger !important;
-  color: green;
+#pageConfigs {
+  background-color: white;
+  height: 100%;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
+#pagePreview {
+  background-color: #fff;
+  width: 30%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 .listCouponInput {
   width: 50%;
   padding: 0.5rem;
 }
-
 .listContainer {
   width: 98%;
   height: 100%;
@@ -275,7 +248,6 @@ input {
   flex-direction: column;
   justify-content: start;
 }
-
 .liIcon {
   width: 5%;
   height: 20px;
@@ -283,11 +255,6 @@ input {
   margin-right: 0.5rem;
   cursor: pointer;
 }
-
-.textDanger {
-  color: red;
-}
-
 .liTextDateContainer {
   width: 20%;
   display: flex;
@@ -295,7 +262,6 @@ input {
   justify-content: space-between;
   align-items: flex-start;
 }
-
 .liTextUsesContainer {
   width: 15%;
   display: flex;
@@ -305,25 +271,21 @@ input {
   margin-left: 1rem;
   margin-right: 1rem;
 }
-
 .liTextDateText {
   display: flex;
   justify-content: center;
   width: 100%;
 }
-
 .liTextDate {
   width: 100%;
   font-size: medium;
   display: flex;
   justify-content: center;
 }
-
 .liTextBig {
   font-size: larger;
-  font-weight: bold;
+  font-weight: 700;
 }
-
 .liContent {
   width: 100%;
   height: auto;
@@ -331,28 +293,24 @@ input {
   flex-direction: row;
   justify-content: space-between;
 }
-
 .countContainer {
   display: flex;
   margin-left: 1rem;
   margin-right: 1rem;
 }
-
 .arrowIcon {
   height: 20px;
-  fill: dimgray;
+  fill: #696969;
   cursor: pointer;
   align-items: center;
   margin-left: 1rem;
 }
-
 .headerText {
   font-size: large;
-  font-weight: bold;
+  font-weight: 700;
 }
-
 .defaultButton {
-  box-shadow: 2px 2px 6px lightgray;
+  box-shadow: 2px 2px 6px #d3d3d3;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -365,61 +323,46 @@ input {
   padding-right: 1rem;
   border-radius: 0.3rem;
 }
-
 .defaultButton:active {
   transform: translate(0.1rem, 0.1rem);
 }
-
 .defaultButton:hover {
   filter: brightness(120%);
 }
-
 .cancelButton {
   background-color: gray;
-  color: white;
+  color: #fff;
 }
-
 .saveButton {
   background-color: green;
-  color: white;
+  color: #fff;
 }
-
 .deleteButton {
   background-color: red;
-  color: white;
+  color: #fff;
 }
-
 .primaryButton {
-  background-color: dodgerblue;
-  color: white;
+  background-color: #1e90ff;
+  color: #fff;
 }
-
 .modalWindow {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: #fff;
   border-radius: 0.3rem;
   width: 40%;
   height: 50%;
 }
-
-.requiredField {
-  border-style: solid;
-  border-color: red !important;
-}
-
 .modalText {
   font-size: large;
 }
-
 .modalTextCoupon {
   font-size: x-large;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 2rem;
 }
-
 .modalLine {
   width: 60%;
   display: flex;
@@ -427,19 +370,16 @@ input {
   align-items: center;
   margin-bottom: 1rem;
 }
-
 .modalButtons {
   margin-top: 2rem;
 }
-
 .editCouponInput {
-  border-color: lightgray;
+  border-color: #d3d3d3;
   font-size: medium;
   text-align: center;
   border-radius: 0.3rem;
   padding: 0.2rem;
 }
-
 .configContainer {
   width: 100%;
   height: 100%;
@@ -448,7 +388,6 @@ input {
   justify-content: center;
   align-items: center;
 }
-
 .configLine {
   font-size: large;
   border-radius: 0.3rem;
@@ -460,39 +399,210 @@ input {
   justify-content: space-between;
   align-items: center;
 }
-
 .configText {
   display: flex;
   justify-content: start;
 }
-
 .configInput {
   font-size: large;
-  font-weight: bold;
+  font-weight: 700;
   width: 70px;
 }
-
+.pagePreviewButton {
+  width: 100%;
+  height: 35%;
+  font-weight: 700;
+  font-size: x-large;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px #d3d3d3;
+}
+.pagePreviewButton:hover {
+  filter: brightness(110%);
+}
+.pagePreviewButton:active {
+  transform: translate(2px, 2px);
+}
+#pagePreviewContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+#pagePreviewTopImageContainer {
+  width: 90%;
+  height: 40%;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#pagePreviewContentTextContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  height: 30%;
+}
+#pagePreviewButtonsContainer {
+  width: 90%;
+  height: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+#pagePreviewContentText {
+  width: 90%;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: x-large;
+  text-align: center;
+  line-height: 1.4;
+  flex-wrap: wrap;
+}
+#pagePreviewGoButton {
+  background-color: #f4ab34;
+}
+#pagePreviewCodeButton {
+  background-color: #fff;
+  border-style: dashed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+#pagePreviewCouponCodeText {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+#pagePreviewCopyIcon {
+  position: absolute;
+  right: 0;
+  height: 40%;
+  margin-right: 1rem;
+  fill: gray;
+  display: flex;
+  justify-content: center;
+}
+#pagePreviewInstructionText {
+  color: #4d4d4d;
+  width: 100%;
+  height: 20%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#pagePreviewTopImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  object-fit: contain;
+}
+#pageConfigTitle {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+#pageConfigsImageLine {
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 8px gray;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+#pageConfigsBottomContainer {
+  width: 90%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#pageConfigsLeftContainer {
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 8px gray;
+  width: 60%;
+  align-items: center;
+}
+#pageConfigsRightContainer {
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 8px gray;
+  width: 35%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.pageConfigPadding {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
+}
+.pageConfigText {
+  text-align: center;
+}
+#pageConfigText {
+  width: 90%;
+  height: 100%;
+  padding: 1rem;
+  resize: none;
+}
+#pageConfigLineButtons {
+  width: 50%;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.pageConfigLineTall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#pageConfigBackgroundColor,
+#pageConfigButtonColor,
+#pageConfigTextColor {
+  width: 50%;
+  cursor: text;
+  text-transform: capitalize;
+}
 @media only screen and (max-width: 768px) {
   #listSectionHeader {
     flex-direction: column;
+  }
+  #pageSection {
+    flex-direction: column;
+    height: 200%;
+  }
+  #pagePreview {
+    width: 100%;
   }
   .headerText {
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
-
   .modalWindow {
     width: 95%;
+    height: 60%;
   }
   .modalButtons {
     width: 100%;
     justify-content: space-evenly;
   }
-
   .configLine {
     width: 80%;
   }
-
   li {
     flex-direction: column;
     margin-bottom: 2rem;
@@ -525,20 +635,34 @@ input {
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
+  #pageConfigs {
+    width: 100%;
+  }
+  #pagePreview {
+    width: 100%;
+    height: 200vh;
+  }
+  #pageConfigText {
+    width: 80%;
+    text-align: center;
+  }
+  #pageConfigsRightContainer {
+    width: 40%;
+  }
+  #pageConfigBackgroundColor,
+  #pageConfigButtonColor,
+  #pageConfigTextColor {
+    width: 80%;
+  }
 }
-
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
   appearance: none;
   margin: 0;
 }
-
-/* Firefox */
 input[type="number"] {
   appearance: textfield;
 }
-
 .hidden {
   display: none !important;
 }

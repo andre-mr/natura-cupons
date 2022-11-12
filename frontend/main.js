@@ -1,8 +1,10 @@
+// replace with real domain
 const backendURL = "http://localhost:3000";
 
 const sectionSelector = document.getElementById("sectionSelector");
 const listSection = document.getElementById("listSection");
 const configSection = document.getElementById("configSection");
+const pageSection = document.getElementById("pageSection");
 const liItemTemplate = document.getElementById("liItemTemplate");
 const couponsSort = document.getElementById("couponsSort");
 const arrowUp = document.getElementById("arrowUp");
@@ -45,20 +47,30 @@ const apikeySection = document.getElementById("apikeySection");
 const logoutButton = document.getElementById("logoutButton");
 const loginButton = document.getElementById("loginButton");
 
-let coupons = [];
-let configs = {
-  couponUses: 0,
-  redirectsPerUse: 0,
-  alertRemainingUses: 0,
-  autoUpdateInterval: 0,
-  expiredDays: 0,
-};
-let sort = "uses";
-let sortASC = 1;
-let selectedCoupon;
-let apikey;
-let autoUpdateTimer = 0;
-let autoUpdateRunning = false;
+const pagePreviewTopImage = document.getElementById("pagePreviewTopImage");
+const pagePreviewContentText = document.getElementById(
+  "pagePreviewContentText"
+);
+const pagePreviewCouponCodeText = document.getElementById(
+  "pagePreviewCouponCodeText"
+);
+const pagePreviewCodeButton = document.getElementById("pagePreviewCodeButton");
+const pagePreviewCGoButton = document.getElementById("pagePreviewGoButton");
+const pagePreviewContainer = document.getElementById("pagePreviewContainer");
+
+const pageConfigImageSelector = document.getElementById(
+  "pageConfigImageSelector"
+);
+const pageConfigText = document.getElementById("pageConfigText");
+const pageConfigTextColor = document.getElementById("pageConfigTextColor");
+const pageConfigBackgroundColor = document.getElementById(
+  "pageConfigBackgroundColor"
+);
+const pageConfigButtonColor = document.getElementById("pageConfigButtonColor");
+const pageConfigResetButton = document.getElementById("pageConfigResetButton");
+const pageConfigUpdateButton = document.getElementById(
+  "pageConfigUpdateButton"
+);
 
 sectionSelector.addEventListener("change", changeSection);
 couponsSort.addEventListener("change", changeCouponsSort);
@@ -75,6 +87,42 @@ apikeyInput.addEventListener("keypress", userLogin);
 loginButton.addEventListener("click", userLogin);
 logoutButton.addEventListener("click", userLogout);
 editCouponCode.addEventListener("keypress", updateCoupon);
+pageConfigImageSelector.addEventListener("change", changeImageSelected);
+pageConfigText.addEventListener("input", changePageConfigText);
+pageConfigTextColor.addEventListener("input", changePageConfigTextColor);
+pageConfigBackgroundColor.addEventListener(
+  "input",
+  changePageConfigBackgroundColor
+);
+pageConfigButtonColor.addEventListener("input", changePageConfigButtonColor);
+pageConfigResetButton.addEventListener("click", pageConfigResetForm);
+pageConfigUpdateButton.addEventListener("click", pageConfigUpdateConfigs);
+
+class CouponsConfigs {
+  alertRemainingUses = 5;
+  autoUpdateInterval = 5;
+  couponUses = 50;
+  expiredDays = 30;
+  redirectsPerUse = 5;
+}
+
+class PageConfigs {
+  backgroundColor = "";
+  textColor = "";
+  buttonColor = "";
+  text = "";
+  imageB64 = "";
+}
+
+let coupons = [];
+let couponsConfigs = new CouponsConfigs();
+let pageConfigs = null;
+let sort = "uses";
+let sortASC = 1;
+let selectedCoupon;
+let apikey;
+let autoUpdateTimer = 0;
+let autoUpdateRunning = false;
 
 const autoUpdateLoop = setInterval(async () => {
   if (autoUpdateRunning) {
@@ -89,8 +137,102 @@ const autoUpdateLoop = setInterval(async () => {
   }
 }, 1000);
 
+async function pageConfigUpdateConfigs() {
+  const defaultHeader = new Headers();
+  defaultHeader.append("Content-Type", "application/json");
+
+  const newConfigs = new PageConfigs();
+  newConfigs.backgroundColor = pageConfigs.backgroundColor;
+  newConfigs.buttonColor = pageConfigs.buttonColor;
+  newConfigs.textColor = pageConfigs.textColor;
+  newConfigs.text = pageConfigs.text;
+  newConfigs.imageB64 = pageConfigs.imageB64;
+
+  const requestConfigs = [];
+  requestConfigs.push({
+    description: "backgroundColor",
+    value: pageConfigs.backgroundColor,
+  });
+  requestConfigs.push({
+    description: "buttonColor",
+    value: pageConfigs.buttonColor,
+  });
+  requestConfigs.push({
+    description: "imageB64",
+    value: pageConfigs.imageB64,
+  });
+  requestConfigs.push({
+    description: "text",
+    value: pageConfigs.text,
+  });
+  requestConfigs.push({
+    description: "textColor",
+    value: pageConfigs.imageB64,
+  });
+  const requestJSON = JSON.stringify(requestConfigs);
+
+  const requestOptions = {
+    method: "PUT",
+    headers: defaultHeader,
+    body: requestJSON,
+    redirect: "follow",
+  };
+
+  fetch(`${backendURL}/configs/page/update?apikey=${apikey}`, requestOptions)
+    .then(async (response) => {
+      window.alert("Configurações atualizadas!");
+      await pageConfigResetForm();
+      populatePageConfigs();
+      applyPagePreview();
+    })
+    .catch(async (error) => {
+      window.alert("Ocorreu um erro na atualização!");
+      // await getCouponsConfigs();
+      // populateConfigs();
+    });
+}
+
+async function pageConfigResetForm() {
+  await getPageConfigs();
+  pageConfigImageSelector.value = null;
+  pageConfigText.value = null;
+  pageConfigBackgroundColor.value = null;
+  pageConfigButtonColor.value = null;
+  pageConfigTextColor.value = null;
+  applyPagePreview();
+}
+
+async function changePageConfigText(e) {
+  pageConfigs.text = e.target.value;
+  pagePreviewContentText.innerText = pageConfigs.text;
+}
+
+async function changePageConfigTextColor(e) {
+  pageConfigs.textColor = `${e.target.value}`;
+  applyPagePreview();
+}
+
+async function changePageConfigBackgroundColor(e) {
+  pageConfigs.backgroundColor = `${e.target.value}`;
+  applyPagePreview();
+}
+
+async function changePageConfigButtonColor(e) {
+  pageConfigs.buttonColor = `${e.target.value}`;
+  applyPagePreview();
+}
+
+async function changeImageSelected(e) {
+  var reader = new FileReader();
+  reader.onload = function () {
+    pageConfigs.imageB64 = reader.result;
+    pagePreviewTopImage.src = pageConfigs.imageB64;
+  };
+  reader.readAsDataURL(e.target.files[0]);
+}
+
 function resetAutoUpdateTimer() {
-  autoUpdateTimer = configs.autoUpdateInterval * 60;
+  autoUpdateTimer = couponsConfigs.autoUpdateInterval * 60;
 }
 
 async function highlightChange(element) {
@@ -160,14 +302,21 @@ async function changeSection(e) {
       break;
     case "settings":
       showConfigSection();
-      await getConfigs();
+      await getCouponsConfigs();
+      populateConfigs();
+      autoUpdateRunning = false;
+      break;
+    case "page":
+      showPageSection();
+      await getPageConfigs();
+      applyPagePreview();
       autoUpdateRunning = false;
       break;
   }
 }
 
 async function resetConfigs() {
-  await getConfigs();
+  await getCouponsConfigs();
   populateConfigs();
 }
 
@@ -191,12 +340,12 @@ async function updateConfigs() {
         apikey = configApikey.value;
         configApikey.value = null;
         localStorage.setItem("apikey", apikey);
-        await getConfigs();
+        await getCouponsConfigs();
         populateConfigs();
       })
       .catch(async (error) => {
         window.alert("Ocorreu um erro na atualização!");
-        await getConfigs();
+        await getCouponsConfigs();
         populateConfigs();
       });
   }
@@ -235,12 +384,12 @@ async function updateConfigs() {
     fetch(`${backendURL}/configs/update?apikey=${apikey}`, requestOptions)
       .then(async (response) => {
         window.alert("Configurações atualizadas!");
-        await getConfigs();
+        await getCouponsConfigs();
         populateConfigs();
       })
       .catch(async (error) => {
         window.alert("Ocorreu um erro na atualização!");
-        await getConfigs();
+        await getCouponsConfigs();
         populateConfigs();
       });
   }
@@ -253,11 +402,11 @@ function validateConfigsForm() {
     configCouponUses.value &&
     configExpiredDays.value &&
     configRedirectsPerUse.value &&
-    (configAlertRemainingUses.value != configs.alertRemainingUses ||
-      configAutoUpdateInterval.value != configs.autoUpdateInterval ||
-      configCouponUses.value != configs.couponUses ||
-      configExpiredDays.value != configs.expiredDays ||
-      configRedirectsPerUse.value != configs.redirectsPerUse)
+    (configAlertRemainingUses.value != couponsConfigs.alertRemainingUses ||
+      configAutoUpdateInterval.value != couponsConfigs.autoUpdateInterval ||
+      configCouponUses.value != couponsConfigs.couponUses ||
+      configExpiredDays.value != couponsConfigs.expiredDays ||
+      configRedirectsPerUse.value != couponsConfigs.redirectsPerUse)
   );
 }
 
@@ -434,6 +583,9 @@ function showListSection() {
   !configSection.classList.contains("hidden")
     ? configSection.classList.add("hidden")
     : null;
+  !pageSection.classList.contains("hidden")
+    ? pageSection.classList.add("hidden")
+    : null;
 }
 
 function showConfigSection() {
@@ -442,6 +594,21 @@ function showConfigSection() {
     : null;
   !listSection.classList.contains("hidden")
     ? listSection.classList.add("hidden")
+    : null;
+  !pageSection.classList.contains("hidden")
+    ? pageSection.classList.add("hidden")
+    : null;
+}
+
+function showPageSection() {
+  pageSection.classList.contains("hidden")
+    ? pageSection.classList.remove("hidden")
+    : null;
+  !listSection.classList.contains("hidden")
+    ? listSection.classList.add("hidden")
+    : null;
+  !configSection.classList.contains("hidden")
+    ? configSection.classList.add("hidden")
     : null;
 }
 
@@ -467,10 +634,16 @@ async function getCouponsInactive() {
   }
 }
 
-async function getConfigs() {
-  const result = await fetch(`${backendURL}/configs/all?apikey=${apikey}`);
+async function getCouponsConfigs() {
+  const result = await fetch(`${backendURL}/configs/coupons?apikey=${apikey}`);
   const resultJSON = await result.json();
-  configs = JSON.parse(JSON.stringify(resultJSON));
+  couponsConfigs = JSON.parse(JSON.stringify(resultJSON));
+}
+
+async function getPageConfigs() {
+  const result = await fetch(`${backendURL}/configs/page?apikey=${apikey}`);
+  const resultJSON = await result.json();
+  pageConfigs = JSON.parse(JSON.stringify(resultJSON));
 }
 
 function populateCouponsList() {
@@ -493,7 +666,7 @@ function populateCouponsList() {
       newItem.querySelector(".liTextCode").classList.add("highlightCurrent");
     }
 
-    if (coupon.uses <= configs.alertRemainingUses) {
+    if (coupon.uses <= couponsConfigs.alertRemainingUses) {
       !newItem.querySelector(".liTextCode").classList.contains("textDanger")
         ? newItem.querySelector(".liTextCode").classList.add("textDanger")
         : null;
@@ -522,7 +695,7 @@ function populateCouponsList() {
       coupon.redirects >= 0 ? coupon.redirects : 0
     }`;
     newItem.querySelector(".liTextUses").value = `${coupon.uses}`;
-    if (coupon.uses < configs.alertRemainingUses) {
+    if (coupon.uses <= couponsConfigs.alertRemainingUses) {
       !newItem.querySelector(".liTextUses").classList.contains("textDanger")
         ? newItem.querySelector(".liTextUses").classList.add("textDanger")
         : null;
@@ -637,10 +810,10 @@ function showEditModal(e) {
   editCouponCode.value = "";
   editCouponCreated.value = formatDateUS(new Date());
   const expiredDate = new Date();
-  expiredDate.setDate(expiredDate.getDate() + configs.expiredDays);
+  expiredDate.setDate(expiredDate.getDate() + couponsConfigs.expiredDays);
   editCouponExpired.value = formatDateUS(expiredDate);
   editCouponRedirects.value = 0;
-  editCouponUses.value = configs.couponUses;
+  editCouponUses.value = couponsConfigs.couponUses;
   editCouponCode.focus();
 }
 
@@ -707,9 +880,11 @@ async function startup() {
   document.getElementById("apikeySection").classList.add("hidden");
   document.getElementById("headerSection").classList.remove("hidden");
   document.getElementById("mainSection").classList.remove("hidden");
-  await getConfigs();
+  await getCouponsConfigs();
   await getCouponsActive();
+  await getPageConfigs();
   populateConfigs();
+  populatePageConfigs();
   sortCoupons();
   populateCouponsList();
   window.addEventListener("keypress", resetAutoUpdateTimer);
@@ -718,11 +893,37 @@ async function startup() {
 }
 
 function populateConfigs() {
-  configCouponUses.value = configs.couponUses;
-  configRedirectsPerUse.value = configs.redirectsPerUse;
-  configAlertRemainingUses.value = configs.alertRemainingUses;
-  configAutoUpdateInterval.value = configs.autoUpdateInterval;
-  configExpiredDays.value = configs.expiredDays;
+  configCouponUses.value = couponsConfigs.couponUses;
+  configRedirectsPerUse.value = couponsConfigs.redirectsPerUse;
+  configAlertRemainingUses.value = couponsConfigs.alertRemainingUses;
+  configAutoUpdateInterval.value = couponsConfigs.autoUpdateInterval;
+  configExpiredDays.value = couponsConfigs.expiredDays;
+}
+
+function populatePageConfigs() {
+  //
+}
+
+function applyPagePreview() {
+  pagePreviewTopImage.src = pageConfigs.imageB64;
+  pagePreviewContentText.innerText = pageConfigs.text;
+
+  pagePreviewContainer.style.setProperty(
+    "background-color",
+    `#${pageConfigs.backgroundColor}`
+  );
+  pagePreviewContentText.style.setProperty(
+    "color",
+    `#${pageConfigs.textColor}`
+  );
+  pagePreviewCodeButton.style.setProperty(
+    "border-color",
+    `#${pageConfigs.buttonColor}`
+  );
+  pagePreviewGoButton.style.setProperty(
+    "background-color",
+    `#${pageConfigs.buttonColor}`
+  );
 }
 
 autoLogin();
