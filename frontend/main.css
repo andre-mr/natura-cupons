@@ -442,6 +442,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 2%;
 }
 #pagePreviewContentTextContainer {
   width: 90%;
@@ -472,7 +473,7 @@ input {
   background-color: white;
 }
 #pagePreviewCodeButton {
-  background-color: #fff;
+  background-color: white;
   border-style: dashed;
   display: flex;
   justify-content: space-between;
@@ -500,7 +501,8 @@ input {
   text-align: center;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
+  font-size: large;
 }
 #pagePreviewTopImage {
   width: 100%;
@@ -575,12 +577,11 @@ input {
   flex-direction: column;
   align-items: center;
 }
-#pageConfigsBackgroundColor,
-#pageConfigsButtonColor,
-#pageConfigsTextColor {
-  width: 50%;
-  cursor: text;
-  text-transform: capitalize;
+.pageConfigsColorPicker {
+  width: 100px;
+  /* height: 20px; */
+  cursor: pointer;
+  margin-bottom: 1rem;
 }
 .highlightCurrent {
   font-size: larger;
@@ -665,11 +666,6 @@ input {
   }
   #pageConfigsRightContainer {
     width: 40%;
-  }
-  #pageConfigsBackgroundColor,
-  #pageConfigsButtonColor,
-  #pageConfigsTextColor {
-    width: 80%;
   }
 }
 input::-webkit-inner-spin-button,

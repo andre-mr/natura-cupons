@@ -95,7 +95,7 @@ pageConfigsImageSelector.addEventListener("change", changeImageSelected);
 pageConfigsText.addEventListener("input", changePageConfigsText);
 pageConfigsTextColor.addEventListener("input", changePageConfigsTextColor);
 pageConfigsBackgroundColor.addEventListener(
-  "input",
+  "change",
   changePageConfigsBackgroundColor
 );
 pageConfigsButtonColor.addEventListener("input", changePageConfigsButtonColor);
@@ -112,10 +112,10 @@ class CouponsConfigs {
 
 class PageConfigs {
   backgroundColor = "";
-  textColor = "";
   buttonColor = "";
+  image = "";
   text = "";
-  imageB64 = "";
+  textColor = "";
 }
 
 let coupons = [];
@@ -150,7 +150,7 @@ async function pageConfigsUpdateConfigs() {
   newConfigs.buttonColor = pageConfigs.buttonColor;
   newConfigs.textColor = pageConfigs.textColor;
   newConfigs.text = pageConfigs.text;
-  newConfigs.imageB64 = pageConfigs.imageB64;
+  newConfigs.image = pageConfigs.image;
 
   const requestConfigs = [];
   requestConfigs.push({
@@ -162,8 +162,8 @@ async function pageConfigsUpdateConfigs() {
     value: pageConfigs.buttonColor,
   });
   requestConfigs.push({
-    description: "imageB64",
-    value: pageConfigs.imageB64,
+    description: "image",
+    value: pageConfigs.image,
   });
   requestConfigs.push({
     description: "text",
@@ -171,7 +171,7 @@ async function pageConfigsUpdateConfigs() {
   });
   requestConfigs.push({
     description: "textColor",
-    value: pageConfigs.imageB64,
+    value: pageConfigs.textColor,
   });
   const requestJSON = JSON.stringify(requestConfigs);
 
@@ -199,10 +199,10 @@ async function pageConfigsUpdateConfigs() {
 async function pageConfigsResetForm() {
   await getPageConfigs();
   pageConfigsImageSelector.value = null;
-  pageConfigsText.value = null;
-  pageConfigsBackgroundColor.value = null;
-  pageConfigsButtonColor.value = null;
-  pageConfigsTextColor.value = null;
+  pageConfigsText.value = pageConfigs.text;
+  pageConfigsBackgroundColor.value = pageConfigs.backgroundColor;
+  pageConfigsButtonColor.value = pageConfigs.buttonColor;
+  pageConfigsTextColor.value = pageConfigs.textColor;
   applyPagePreview();
 }
 
@@ -229,8 +229,8 @@ async function changePageConfigsButtonColor(e) {
 async function changeImageSelected(e) {
   var reader = new FileReader();
   reader.onload = function () {
-    pageConfigs.imageB64 = reader.result;
-    pagePreviewTopImage.src = pageConfigs.imageB64;
+    pageConfigs.image = reader.result;
+    pagePreviewTopImage.src = pageConfigs.image;
   };
   reader.readAsDataURL(e.target.files[0]);
 }
@@ -908,28 +908,28 @@ function populateConfigs() {
 }
 
 function populatePageConfigs() {
-  //
+  pageConfigsBackgroundColor.value = pageConfigs.backgroundColor;
+  pageConfigsButtonColor.value = pageConfigs.buttonColor;
+  pageConfigsText.value = pageConfigs.text;
+  pageConfigsTextColor.value = pageConfigs.textColor;
 }
 
 function applyPagePreview() {
-  pagePreviewTopImage.src = pageConfigs.imageB64;
+  pagePreviewTopImage.src = pageConfigs.image;
   pagePreviewContentText.innerText = pageConfigs.text;
 
   pagePreviewContainer.style.setProperty(
     "background-color",
-    `#${pageConfigs.backgroundColor}`
+    `${pageConfigs.backgroundColor}`
   );
-  pagePreviewContentText.style.setProperty(
-    "color",
-    `#${pageConfigs.textColor}`
-  );
+  pagePreviewContentText.style.setProperty("color", `${pageConfigs.textColor}`);
   pagePreviewCodeButton.style.setProperty(
     "border-color",
-    `#${pageConfigs.buttonColor}`
+    `${pageConfigs.buttonColor}`
   );
   pagePreviewGoButton.style.setProperty(
     "background-color",
-    `#${pageConfigs.buttonColor}`
+    `${pageConfigs.buttonColor}`
   );
 }
 

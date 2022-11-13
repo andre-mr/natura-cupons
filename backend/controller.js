@@ -1,5 +1,33 @@
 const mysql = require("mysql2/promise.js");
-var crypto = require("crypto");
+const crypto = require("crypto");
+const ftp = require("basic-ftp");
+const { Readable } = require("stream");
+const sharp = require("sharp");
+
+async function uploadImage(imageB64) {
+  const fileName = `${process.env.IMAGE_NAME_TM}.jpg`;
+  const imageURL = `${process.env.FTP_IMAGE_URL}/${fileName}` || null;
+  const base64Image = imageB64.split(";base64,").pop();
+  const imageBuffer = Buffer.from(base64Image, "base64");
+  const sharpedFile = await sharp(imageBuffer).jpeg({ quality: 65 }).toBuffer();
+  const client = new ftp.Client();
+  try {
+    await client.access({
+      host: process.env.FTP_HOST,
+      user: process.env.FTP_USER,
+      password: process.env.FTP_PASSWORD,
+    });
+    await client.ensureDir(`/`);
+    file = Readable.from(sharpedFile);
+    await client.uploadFrom(file, fileName);
+  } catch (err) {
+    console.log(err);
+    client.close();
+    return null;
+  }
+  client.close();
+  return imageURL;
+}
 
 async function chooseRedirectCoupon() {
   const configs = await getCouponsConfigs();
@@ -183,18 +211,22 @@ async function getCouponsConfigs() {
     configsArray = [];
     const newConfigs = new CouponsConfigs();
     configsArray.push([
-      "page",
+      "coupons",
       "alertRemainingUses",
       newConfigs.alertRemainingUses,
     ]);
     configsArray.push([
-      "page",
+      "coupons",
       "autoUpdateInterval",
       newConfigs.autoUpdateInterval,
     ]);
-    configsArray.push(["page", "couponUses", newConfigs.couponUses]);
-    configsArray.push(["page", "expiredDays", newConfigs.expiredDays]);
-    configsArray.push(["page", "redirectsPerUse", newConfigs.redirectsPerUse]);
+    configsArray.push(["coupons", "couponUses", newConfigs.couponUses]);
+    configsArray.push(["coupons", "expiredDays", newConfigs.expiredDays]);
+    configsArray.push([
+      "coupons",
+      "redirectsPerUse",
+      newConfigs.redirectsPerUse,
+    ]);
 
     await addConfigs(configsArray);
 
@@ -228,10 +260,10 @@ async function getPageConfigs() {
     configsArray = [];
     const newConfigs = new PageConfigs();
     configsArray.push(["page", "backgroundColor", newConfigs.backgroundColor]);
-    configsArray.push(["page", "textColor", newConfigs.textColor]);
     configsArray.push(["page", "buttonColor", newConfigs.buttonColor]);
+    configsArray.push(["page", "image", newConfigs.image]);
     configsArray.push(["page", "text", newConfigs.text]);
-    configsArray.push(["page", "imageB64", newConfigs.imageB64]);
+    configsArray.push(["page", "textColor", newConfigs.textColor]);
 
     await addConfigs(configsArray);
 
@@ -268,6 +300,19 @@ async function updateCouponsConfigs(configs) {
 }
 
 async function updatePageConfigs(configs) {
+  console.log(configs.backgroundColor);
+  let imageB64;
+  let imageURL;
+  for (cfg of configs) {
+    if (cfg.description == "image") {
+      imageB64 = cfg.value;
+      break;
+    }
+  }
+  if (imageB64) {
+    imageURL = await uploadImage(imageB64);
+  }
+  configs.image = imageURL;
   const sql = `UPDATE configs SET value=? WHERE description=? AND type='page'`;
   for (const config of configs) {
     const values = [config.value, config.description];
@@ -363,9 +408,9 @@ class CouponsConfigs {
 }
 
 class PageConfigs {
-  backgroundColor = "FFFFFF";
-  buttonColor = "CCCCCC";
-  imageB64 = "";
-  text = "natura";
-  textColor = "000000";
+  backgroundColor = "";
+  buttonColor = "";
+  image = "";
+  text = "";
+  textColor = "";
 }

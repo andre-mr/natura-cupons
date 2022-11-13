@@ -2,11 +2,11 @@
 const apiURL = "http://localhost:3000";
 
 class PageConfigs {
-  backgroundColor = "FFFFFF";
-  buttonColor = "CCCCCC";
-  imageB64 = "";
-  text = "...";
-  textColor = "000000";
+  backgroundColor = "";
+  buttonColor = "";
+  image = "";
+  text = "";
+  textColor = "";
 }
 
 const params = new URL(document.location).searchParams;
@@ -42,13 +42,13 @@ async function getPageConfigs() {
 }
 
 async function applyPageConfigs() {
-  topImage.src = pageConfigs.imageB64;
+  topImage.src = pageConfigs.image;
   contentText.innerText = pageConfigs.text;
 
-  document.body.style.backgroundColor = `#${pageConfigs.backgroundColor}`;
-  contentText.style.setProperty("color", `#${pageConfigs.textColor}`);
-  codeButton.style.setProperty("border-color", `#${pageConfigs.buttonColor}`);
-  goButton.style.setProperty("background-color", `#${pageConfigs.buttonColor}`);
+  document.body.style.backgroundColor = `${pageConfigs.backgroundColor}`;
+  contentText.style.setProperty("color", `${pageConfigs.textColor}`);
+  codeButton.style.setProperty("border-color", `${pageConfigs.buttonColor}`);
+  goButton.style.setProperty("background-color", `${pageConfigs.buttonColor}`);
 }
 
 async function goProduct() {
