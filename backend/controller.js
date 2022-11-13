@@ -300,19 +300,13 @@ async function updateCouponsConfigs(configs) {
 }
 
 async function updatePageConfigs(configs) {
-  console.log(configs.backgroundColor);
-  let imageB64;
-  let imageURL;
-  for (cfg of configs) {
-    if (cfg.description == "image") {
-      imageB64 = cfg.value;
+  for (let i = 0; i < configs.length; i++) {
+    if (configs[i].description == "image") {
+      const imageURL = await uploadImage(configs[i].value);
+      configs[i].value = imageURL;
       break;
     }
   }
-  if (imageB64) {
-    imageURL = await uploadImage(imageB64);
-  }
-  configs.image = imageURL;
   const sql = `UPDATE configs SET value=? WHERE description=? AND type='page'`;
   for (const config of configs) {
     const values = [config.value, config.description];
