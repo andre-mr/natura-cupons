@@ -236,19 +236,19 @@
                 />
               </div>
               <div class="pageConfigsLine pageConfigsLineTall">
-                <p class="pageConfigsText pageConfigsPadding">Cor do texto:</p>
-                <input
-                  id="pageConfigsTextColor"
-                  class="pageConfigsColorPicker"
-                  type="color"
-                />
-              </div>
-              <div class="pageConfigsLine pageConfigsLineTall">
                 <p class="pageConfigsText pageConfigsPadding">
                   Cor dos botões:
                 </p>
                 <input
                   id="pageConfigsButtonColor"
+                  class="pageConfigsColorPicker"
+                  type="color"
+                />
+              </div>
+              <div class="pageConfigsLine pageConfigsLineTall">
+                <p class="pageConfigsText pageConfigsPadding">Cor do texto:</p>
+                <input
+                  id="pageConfigsTextColor"
                   class="pageConfigsColorPicker"
                   type="color"
                 />
@@ -274,13 +274,7 @@
                 alt="Imagem do consultor"
               />
             </div>
-            <div id="pagePreviewContentTextContainer">
-              <p id="pagePreviewContentText">...</p>
-            </div>
             <div id="pagePreviewButtonsContainer">
-              <div id="pagePreviewInstructionText">
-                Cole ou digite na sacola de compras:
-              </div>
               <div id="pagePreviewCodeButton" class="pagePreviewButton">
                 <div id="pagePreviewCouponCodeText">CODIGO</div>
                 <svg
@@ -294,9 +288,15 @@
                   />
                 </svg>
               </div>
+              <div id="pagePreviewInstructionText">
+                Cole ou digite na sacola de compras
+              </div>
               <div id="pagePreviewGoButton" class="pagePreviewButton">
                 Copiar e ir à loja
               </div>
+            </div>
+            <div id="pagePreviewContentTextContainer">
+              <p id="pagePreviewContentText">...</p>
             </div>
           </div>
         </div>

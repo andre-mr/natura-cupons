@@ -817,7 +817,11 @@ function showEditModal(e) {
   editCouponCode.value = "";
   editCouponCreated.value = formatDateUS(new Date());
   const expiredDate = new Date();
-  expiredDate.setDate(expiredDate.getDate() + couponsConfigs.expiredDays);
+  expiredDate.setDate(
+    expiredDate.getDate() + Number.parseInt(couponsConfigs.expiredDays)
+  );
+  console.log(expiredDate.toDateString());
+  console.log(expiredDate);
   editCouponExpired.value = formatDateUS(expiredDate);
   editCouponRedirects.value = 0;
   editCouponUses.value = couponsConfigs.couponUses;

@@ -223,14 +223,14 @@ input {
 #pageConfigs {
   background-color: white;
   height: 100%;
-  width: 72%;
+  width: 74%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 #pagePreview {
   background-color: #fff;
-  width: 28%;
+  width: 26%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -436,13 +436,12 @@ input {
 }
 #pagePreviewTopImageContainer {
   width: 90%;
-  height: 35%;
+  height: 40%;
   border-radius: 0.5rem;
   margin-top: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 2%;
 }
 #pagePreviewContentTextContainer {
   width: 90%;
@@ -456,9 +455,8 @@ input {
   height: 25%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
-  margin-bottom: 10%;
 }
 #pagePreviewContentText {
   width: 90%;
@@ -497,12 +495,12 @@ input {
 #pagePreviewInstructionText {
   color: #4d4d4d;
   width: 100%;
-  height: 20%;
   text-align: center;
-  display: flex;
+  display: none;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   font-size: large;
+  /* display: none; */
 }
 #pagePreviewTopImage {
   width: 100%;
@@ -520,7 +518,7 @@ input {
   width: 90%;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   border-radius: 0.5rem;
   margin-bottom: 2rem;
@@ -558,6 +556,7 @@ input {
 }
 .pageConfigsText {
   text-align: center;
+  font-weight: bold;
 }
 #pageConfigsText {
   width: 90%;

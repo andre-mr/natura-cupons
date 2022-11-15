@@ -302,6 +302,9 @@ async function updateCouponsConfigs(configs) {
 async function updatePageConfigs(configs) {
   for (let i = 0; i < configs.length; i++) {
     if (configs[i].description == "image") {
+      if (configs[i].value.indexOf("https://") >= 0) {
+        break;
+      }
       const imageURL = await uploadImage(configs[i].value);
       configs[i].value = imageURL;
       break;
