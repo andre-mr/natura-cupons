@@ -210,10 +210,10 @@ async function changePageConfigsText(e) {
   pageConfigs.text = e.target.value;
   pagePreviewContentText.innerText = pageConfigs.text;
 
-  pagePreviewContentText.style.setProperty(
-    "font-size",
-    pageConfigs.text.length > 100 ? "large" : "x-large"
-  );
+  // pagePreviewContentText.style.setProperty(
+  //   "font-size",
+  //   pageConfigs.text.length > 100 ? "large" : "x-large"
+  // );
 }
 
 async function changePageConfigsTextColor(e) {
