@@ -43,9 +43,9 @@ async function uploadImage(imageB64) {
     await client.uploadFrom(file, fileName);
     await client.uploadFrom(icon, "favicon.png");
     if (fileFormat == "png") {
-      await client.remove(`/${process.env.IMAGE_NAME_TM}.jpg`);
+      // await client.li.remove(`/${process.env.IMAGE_NAME_TM}.jpg`);
     } else {
-      await client.remove(`/${process.env.IMAGE_NAME_TM}.png`);
+      // await client.remove(`/${process.env.IMAGE_NAME_TM}.png`);
     }
     imageB64 = sharpedFile.toString("base64");
     imageB64 = `data:image/${fileFormat};base64,${imageB64}`;
