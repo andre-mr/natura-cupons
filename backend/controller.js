@@ -8,6 +8,7 @@ class CouponsConfigs {
   alertRemainingUses = 5;
   autoUpdateInterval = 5;
   couponUses = 50;
+  defaultTarget = "";
   expiredDays = 30;
   redirectsPerUse = 5;
 }
@@ -15,6 +16,7 @@ class CouponsConfigs {
 class PageConfigs {
   backgroundColor = "";
   buttonColor = "";
+  defaultTarget = "";
   image = "";
   text = "";
   textColor = "";
@@ -326,6 +328,7 @@ async function getPageConfigs() {
     const newConfigs = new PageConfigs();
     configsArray.push(["page", "backgroundColor", newConfigs.backgroundColor]);
     configsArray.push(["page", "buttonColor", newConfigs.buttonColor]);
+    configsArray.push(["page", "defaultTarget", newConfigs.defaultTarget]);
     configsArray.push(["page", "image", newConfigs.image]);
     configsArray.push(["page", "text", newConfigs.text]);
     configsArray.push(["page", "textColor", newConfigs.textColor]);

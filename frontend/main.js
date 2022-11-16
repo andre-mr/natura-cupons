@@ -61,6 +61,9 @@ const pagePreviewContainer = document.getElementById("pagePreviewContainer");
 const pageConfigsImageSelector = document.getElementById(
   "pageConfigsImageSelector"
 );
+const pageConfigsDefaultTarget = document.getElementById(
+  "pageConfigsDefaultTarget"
+);
 const pageConfigsText = document.getElementById("pageConfigsText");
 const pageConfigsTextColor = document.getElementById("pageConfigsTextColor");
 const pageConfigsBackgroundColor = document.getElementById(
@@ -92,6 +95,10 @@ loginButton.addEventListener("click", userLogin);
 logoutButton.addEventListener("click", userLogout);
 editCouponCode.addEventListener("keypress", updateCoupon);
 pageConfigsImageSelector.addEventListener("change", changeImageSelected);
+pageConfigsDefaultTarget.addEventListener(
+  "input",
+  changePageConfigsDefaultTarget
+);
 pageConfigsText.addEventListener("input", changePageConfigsText);
 pageConfigsTextColor.addEventListener("input", changePageConfigsTextColor);
 pageConfigsBackgroundColor.addEventListener(
@@ -113,6 +120,7 @@ class CouponsConfigs {
 class PageConfigs {
   backgroundColor = "";
   buttonColor = "";
+  defaultTarget = "";
   image = "";
   text = "";
   textColor = "";
@@ -146,11 +154,12 @@ async function pageConfigsUpdateConfigs() {
   defaultHeader.append("Content-Type", "application/json");
 
   const newConfigs = new PageConfigs();
+  newConfigs.image = pageConfigs.image;
+  newConfigs.defaultTarget = pageConfigs.defaultTarget;
+  newConfigs.text = pageConfigs.text;
   newConfigs.backgroundColor = pageConfigs.backgroundColor;
   newConfigs.buttonColor = pageConfigs.buttonColor;
   newConfigs.textColor = pageConfigs.textColor;
-  newConfigs.text = pageConfigs.text;
-  newConfigs.image = pageConfigs.image;
 
   const requestConfigs = [];
   requestConfigs.push({
@@ -160,6 +169,10 @@ async function pageConfigsUpdateConfigs() {
   requestConfigs.push({
     description: "buttonColor",
     value: pageConfigs.buttonColor,
+  });
+  requestConfigs.push({
+    description: "defaultTarget",
+    value: pageConfigs.defaultTarget,
   });
   requestConfigs.push({
     description: "image",
@@ -191,14 +204,13 @@ async function pageConfigsUpdateConfigs() {
     })
     .catch(async (error) => {
       window.alert("Ocorreu um erro na atualização!");
-      // await getCouponsConfigs();
-      // populateConfigs();
     });
 }
 
 async function pageConfigsResetForm() {
   await getPageConfigs();
   pageConfigsImageSelector.value = null;
+  pageConfigsDefaultTarget.value = pageConfigs.defaultTarget;
   pageConfigsText.value = pageConfigs.text;
   pageConfigsBackgroundColor.value = pageConfigs.backgroundColor;
   pageConfigsButtonColor.value = pageConfigs.buttonColor;
@@ -209,11 +221,10 @@ async function pageConfigsResetForm() {
 async function changePageConfigsText(e) {
   pageConfigs.text = e.target.value;
   pagePreviewContentText.innerText = pageConfigs.text;
+}
 
-  // pagePreviewContentText.style.setProperty(
-  //   "font-size",
-  //   pageConfigs.text.length > 100 ? "large" : "x-large"
-  // );
+async function changePageConfigsDefaultTarget(e) {
+  pageConfigs.defaultTarget = e.target.value;
 }
 
 async function changePageConfigsTextColor(e) {
@@ -917,9 +928,10 @@ function populateConfigs() {
 }
 
 function populatePageConfigs() {
+  pageConfigsDefaultTarget.value = pageConfigs.defaultTarget;
+  pageConfigsText.value = pageConfigs.text;
   pageConfigsBackgroundColor.value = pageConfigs.backgroundColor;
   pageConfigsButtonColor.value = pageConfigs.buttonColor;
-  pageConfigsText.value = pageConfigs.text;
   pageConfigsTextColor.value = pageConfigs.textColor;
 }
 

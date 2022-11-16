@@ -4,6 +4,7 @@ const apiURL = "http://localhost:3000";
 class PageConfigs {
   backgroundColor = "";
   buttonColor = "";
+  defaultTarget = "";
   image = "";
   text = "";
   textColor = "";
@@ -49,11 +50,6 @@ async function applyPageConfigs() {
   contentText.style.setProperty("color", `${pageConfigs.textColor}`);
   codeButton.style.setProperty("border-color", `${pageConfigs.buttonColor}`);
   goButton.style.setProperty("background-color", `${pageConfigs.buttonColor}`);
-
-  // contentText.style.setProperty(
-  //   "font-size",
-  //   pageConfigs.text.length > 100 ? "large" : "x-large"
-  // );
 }
 
 async function goProduct() {
@@ -66,12 +62,13 @@ async function copyCode() {
 }
 
 async function startup() {
-  if (!targetURL) {
-    targetURL = "https://www.natura.com.br";
-  }
   await getPageConfigs();
-  await getCoupon();
-  applyPageConfigs();
+  if (!targetURL) {
+    location.replace(pageConfigs.defaultTarget);
+  } else {
+    await getCoupon();
+    applyPageConfigs();
+  }
 }
 
 startup();
