@@ -516,13 +516,14 @@ input {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
-#pageConfigsImageLine {
+#pageConfigsImageLine,
+#pageConfigsTargetLine {
   background-color: whitesmoke;
   box-shadow: 2px 2px 8px gray;
   width: 90%;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   border-radius: 0.5rem;
   margin-bottom: 2rem;
@@ -613,6 +614,10 @@ input {
   }
   #pagePreview {
     width: 100%;
+  }
+  #pageConfigsImageLine,
+  #pageConfigsTargetLine {
+    flex-direction: column;
   }
   .headerText {
     margin-top: 1rem;
