@@ -5,11 +5,30 @@ const { Readable } = require("stream");
 const sharp = require("sharp");
 
 async function uploadImage(imageB64) {
-  const fileName = `${process.env.IMAGE_NAME_TM}.jpg`;
-  const imageURL = `${process.env.FTP_IMAGE_URL}/${fileName}` || null;
+  let fileName = `${process.env.IMAGE_NAME_TM}`;
+  let fileFormat = "";
   const base64Image = imageB64.split(";base64,").pop();
   const imageBuffer = Buffer.from(base64Image, "base64");
-  const sharpedFile = await sharp(imageBuffer).jpeg({ quality: 65 }).toBuffer();
+  let sharpedFile;
+  if (imageB64.indexOf("jpeg;") >= 0) {
+    fileName += ".jpg";
+    fileFormat = "jpeg";
+    sharpedFile = await sharp(imageBuffer)
+      .resize({ width: 400 })
+      .jpeg({ quality: 50 })
+      .toBuffer();
+  } else {
+    fileName += ".png";
+    fileFormat = "png";
+    sharpedFile = await sharp(imageBuffer)
+      .resize({ width: 400 })
+      .png({ quality: 50 })
+      .toBuffer();
+  }
+  const sharpedIcon = await sharp(imageBuffer)
+    .resize({ width: 32 })
+    .png({ quality: 50 })
+    .toBuffer();
   const client = new ftp.Client();
   try {
     await client.access({
@@ -18,15 +37,25 @@ async function uploadImage(imageB64) {
       password: process.env.FTP_PASSWORD,
     });
     await client.ensureDir(`/`);
-    file = Readable.from(sharpedFile);
+    const file = Readable.from(sharpedFile);
+    const icon = Readable.from(sharpedIcon);
+
     await client.uploadFrom(file, fileName);
+    await client.uploadFrom(icon, "favicon.png");
+    if (fileFormat == "png") {
+      await client.remove(`/${process.env.IMAGE_NAME_TM}.jpg`);
+    } else {
+      await client.remove(`/${process.env.IMAGE_NAME_TM}.png`);
+    }
+    imageB64 = sharpedFile.toString("base64");
+    imageB64 = `data:image/${fileFormat};base64,${imageB64}`;
   } catch (err) {
     console.log(err);
     client.close();
     return null;
   }
   client.close();
-  return imageURL;
+  return imageB64;
 }
 
 async function chooseRedirectCoupon() {
@@ -171,19 +200,15 @@ async function getCouponsInactive() {
 }
 
 async function updateCoupon(coupon) {
-  if (coupon.created instanceof Date) {
-    coupon.created = coupon.created.toISOString();
-  }
   if (coupon.expired instanceof Date) {
     coupon.expired = coupon.expired.toISOString();
   }
-  let sql = `UPDATE coupon SET code=?, uses=?, expired=?, redirects=?, created=?, skips=?, active=? WHERE id=? `;
+  let sql = `UPDATE coupon SET code=?, uses=?, expired=?, redirects=?, skips=?, active=? WHERE id=? `;
   let values = [
     coupon.code,
     coupon.uses,
     formatDateTime(coupon.expired),
     coupon.redirects,
-    formatDateTime(coupon.created),
     coupon.skips,
     coupon.active,
     coupon.id,
@@ -305,8 +330,8 @@ async function updatePageConfigs(configs) {
       if (configs[i].value.indexOf("https://") >= 0) {
         break;
       }
-      const imageURL = await uploadImage(configs[i].value);
-      configs[i].value = imageURL;
+      const imageConverted = await uploadImage(configs[i].value);
+      configs[i].value = imageConverted;
       break;
     }
   }
