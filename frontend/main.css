@@ -451,6 +451,7 @@ input {
   align-items: center;
   /* box-shadow: 2px 2px 8px lightgray; */
   text-shadow: 2px 2px 8px lightgray;
+  overflow-y: hidden;
 }
 #pagePreviewButtonsContainer {
   width: 90%;
@@ -464,7 +465,7 @@ input {
   width: 90%;
   border-radius: 0.5rem;
   padding: 0.5rem;
-  font-size: x-large;
+  /* font-size: x-large; */
   text-align: center;
   line-height: 1.4;
   flex-wrap: wrap;

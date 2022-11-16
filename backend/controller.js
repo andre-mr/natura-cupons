@@ -4,6 +4,22 @@ const ftp = require("basic-ftp");
 const { Readable } = require("stream");
 const sharp = require("sharp");
 
+class CouponsConfigs {
+  alertRemainingUses = 5;
+  autoUpdateInterval = 5;
+  couponUses = 50;
+  expiredDays = 30;
+  redirectsPerUse = 5;
+}
+
+class PageConfigs {
+  backgroundColor = "";
+  buttonColor = "";
+  image = "";
+  text = "";
+  textColor = "";
+}
+
 async function uploadImage(imageB64) {
   let fileName = `${process.env.IMAGE_NAME_TM}`;
   let fileFormat = "";
@@ -72,9 +88,17 @@ async function chooseRedirectCoupon() {
   let nextCoupon = null;
   let targetCoupon = null;
 
+  const today = new Date();
   for (let i = 0; i < coupons.length; i++) {
     if (coupons[i].skips > 0) {
       lastCoupon = coupons[i];
+      if (
+        extractDateFromDateTime(lastCoupon.expired) <
+        extractDateFromDateTime(today)
+      ) {
+        lastCoupon.active = 0;
+        lastCoupon.skips = configs.redirectsPerUse;
+      }
       if (lastCoupon.skips < configs.redirectsPerUse) {
         lastCoupon.skips++;
         lastCoupon.redirects++;
@@ -92,6 +116,14 @@ async function chooseRedirectCoupon() {
           nextCoupon = coupons[0];
         }
         nextCoupon.skips++;
+        if (
+          extractDateFromDateTime(nextCoupon.expired) <
+          extractDateFromDateTime(today)
+        ) {
+          await updateCoupon(lastCoupon);
+          await updateCoupon(nextCoupon);
+          return chooseRedirectCoupon();
+        }
         nextCoupon.uses--;
         nextCoupon.redirects++;
         targetCoupon = nextCoupon;
@@ -106,6 +138,14 @@ async function chooseRedirectCoupon() {
     return targetCoupon.code;
   } else {
     targetCoupon = lastCoupon;
+    if (
+      extractDateFromDateTime(targetCoupon.expired) <
+      extractDateFromDateTime(today)
+    ) {
+      targetCoupon.active = 0;
+      updateCoupon(targetCoupon);
+      return null;
+    }
     if (targetCoupon.skips >= configs.redirectsPerUse) {
       targetCoupon.skips = 1;
     } else {
@@ -405,6 +445,12 @@ function formatDateTime(timestamp) {
   )}:${timestamp.substring(14, 16)}:${timestamp.substring(17, 19)}`;
 }
 
+function extractDateFromDateTime(dateTime) {
+  return `${dateTime.getFullYear()}-${(dateTime.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${dateTime.getDate().toString().padStart(2, "0")}`;
+}
+
 module.exports = {
   addCoupon,
   getCouponsActive,
@@ -420,19 +466,3 @@ module.exports = {
   getPageConfigs,
   updatePageConfigs,
 };
-
-class CouponsConfigs {
-  alertRemainingUses = 5;
-  autoUpdateInterval = 5;
-  couponUses = 50;
-  expiredDays = 30;
-  redirectsPerUse = 5;
-}
-
-class PageConfigs {
-  backgroundColor = "";
-  buttonColor = "";
-  image = "";
-  text = "";
-  textColor = "";
-}

@@ -49,6 +49,11 @@ async function applyPageConfigs() {
   contentText.style.setProperty("color", `${pageConfigs.textColor}`);
   codeButton.style.setProperty("border-color", `${pageConfigs.buttonColor}`);
   goButton.style.setProperty("background-color", `${pageConfigs.buttonColor}`);
+
+  contentText.style.setProperty(
+    "font-size",
+    pageConfigs.text.length > 100 ? "large" : "x-large"
+  );
 }
 
 async function goProduct() {
