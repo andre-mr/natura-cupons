@@ -36,6 +36,7 @@ main {
   justify-content: center;
   align-items: center;
   text-shadow: 2px 2px 8px lightgray;
+  margin-bottom: 0.5rem;
 }
 
 #buttonsContainer {
@@ -53,7 +54,7 @@ main {
   padding: 0.5rem;
   font-size: x-large;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.2;
   flex-wrap: wrap;
 }
 
