@@ -1,5 +1,6 @@
 // replace with real domain
 const apiURL = "http://localhost:3000";
+const publicKey = "";
 
 class PageConfigs {
   backgroundColor = "";
@@ -27,7 +28,7 @@ codeButton.addEventListener("click", goProduct);
 
 async function getCoupon() {
   if (targetURL) {
-    const result = await fetch(`${apiURL}`);
+    const result = await fetch(`${apiURL}?publickey=${publicKey}`);
     couponCode = await result.json();
     couponCodeText.innerText = couponCode;
   } else {

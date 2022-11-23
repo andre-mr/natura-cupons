@@ -13,10 +13,17 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json());
 
 app.get("/", async (req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await controller.chooseRedirectCoupon()));
-  res.send();
+  if (req.query.publickey == process.env.PUBLIC_KEY) {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.write(JSON.stringify(await controller.chooseRedirectCoupon()));
+    res.send();
+  } else {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.write(JSON.stringify(["publickey!"]));
+    res.send();
+  }
 });
 
 app.get("/configs/page", async (req, res) => {
