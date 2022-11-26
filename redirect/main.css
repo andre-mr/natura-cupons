@@ -19,6 +19,14 @@ main {
   align-items: center;
 }
 
+a {
+  width: 100%;
+  text-decoration: none;
+  justify-self: center;
+  align-self: center;
+  text-align: center;
+}
+
 #topImageContainer {
   width: 90%;
   height: 40%;
@@ -109,7 +117,7 @@ main {
   width: 100%;
   height: 30%;
   font-weight: 700;
-  font-size: x-large;
+  font-size: large;
   display: flex;
   justify-content: center;
   align-items: center;
