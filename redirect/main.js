@@ -167,14 +167,19 @@ async function registerVisit() {
     visit.userBrowser = "instagram";
   } else if (
     userAgentInfo.toLowerCase().indexOf("safari") >= 0 &&
+    userAgentInfo.toLocaleLowerCase().indexOf("crios") < 0 &&
     (userAgentInfo.toLowerCase().indexOf("ipad") >= 0 ||
+      userAgentInfo.toLowerCase().indexOf("iphone") >= 0 ||
       userAgentInfo.toLowerCase().indexOf("mac os") >= 0 ||
       userAgentInfo.toLowerCase().indexOf("macintosh") >= 0)
   ) {
     visit.userBrowser = "safari";
   } else if (userAgentInfo.toLowerCase().indexOf("edg") >= 0) {
     visit.userBrowser = "edge";
-  } else if (userAgentInfo.toLowerCase().indexOf("chrome") >= 0) {
+  } else if (
+    userAgentInfo.toLowerCase().indexOf("chrome") >= 0 ||
+    userAgentInfo.toLocaleLowerCase().indexOf("crios") >= 0
+  ) {
     visit.userBrowser = "chrome";
   } else if (userAgentInfo.toLowerCase().indexOf("firefox") >= 0) {
     visit.userBrowser = "firefox";
