@@ -33,3 +33,13 @@ CREATE TABLE
         PRIMARY KEY (`id`),
         UNIQUE KEY `id_UNIQUE` (`id`)
     ) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE
+    `visit` (
+        `id` int NOT NULL AUTO_INCREMENT,
+        `date_time` datetime NOT NULL,
+        `user_id` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        `user_device` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        `user_browser` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE = InnoDB AUTO_INCREMENT = 244 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
