@@ -836,9 +836,10 @@ function populateCouponsList() {
     newItem.querySelector(".liTextCode").value = `${coupon.code}`;
     if (coupon.skips > 0) {
       newItem.querySelector(".liTextCode").classList.add("highlightCurrent");
+      newItem.classList.add("highlightBackground");
     }
 
-    if (coupon.uses <= couponsConfigs.alertRemainingUses) {
+    if (coupon.uses <= couponsConfigs.alertRemainingUses && coupon.active) {
       !newItem.querySelector(".liTextCode").classList.contains("textDanger")
         ? newItem.querySelector(".liTextCode").classList.add("textDanger")
         : null;
@@ -864,7 +865,7 @@ function populateCouponsList() {
       .querySelector(".liTextDateExpired")
       .addEventListener("focusout", changeExpiredValue);
     newItem.querySelector(".liTextUses").value = `${coupon.uses}`;
-    if (coupon.uses <= couponsConfigs.alertRemainingUses) {
+    if (coupon.uses <= couponsConfigs.alertRemainingUses && coupon.active) {
       !newItem.querySelector(".liTextUses").classList.contains("textDanger")
         ? newItem.querySelector(".liTextUses").classList.add("textDanger")
         : null;
