@@ -33,6 +33,13 @@ app.get("/configs/page", async (req, res) => {
   res.send();
 });
 
+app.post("/visit/add", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await controller.addVisit(req.body)));
+  res.send();
+});
+
 app.use(async (req, res, next) => {
   if (req.query.apikey) {
     const user = await controller.login(req.query.apikey);
@@ -77,6 +84,13 @@ app.get("/configs/coupons", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.write(JSON.stringify(await controller.getCouponsConfigs()));
+  res.send();
+});
+
+app.get("/visit/all", async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.write(JSON.stringify(await controller.getVisits(req.query)));
   res.send();
 });
 

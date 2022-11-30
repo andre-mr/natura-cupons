@@ -22,6 +22,13 @@ class PageConfigs {
   textColor = "";
 }
 
+class Statistics {
+  Visits = 0;
+  Users = 0;
+  Devices = [];
+  Browsers = [];
+}
+
 async function uploadImage(imageB64) {
   let fileName = `${process.env.IMAGE_NAME_TM}`;
   let fileFormat = "";
@@ -60,11 +67,6 @@ async function uploadImage(imageB64) {
 
     await client.uploadFrom(file, fileName);
     await client.uploadFrom(icon, "favicon.png");
-    if (fileFormat == "png") {
-      // await client.li.remove(`/${process.env.IMAGE_NAME_TM}.jpg`);
-    } else {
-      // await client.remove(`/${process.env.IMAGE_NAME_TM}.png`);
-    }
     imageB64 = sharpedFile.toString("base64");
     imageB64 = `data:image/${fileFormat};base64,${imageB64}`;
   } catch (err) {
@@ -163,14 +165,68 @@ async function chooseRedirectCoupon() {
   }
 }
 
+async function addVisit(visit) {
+  const today = new Date();
+  let userID;
+  if (visit.userID) {
+    userID = visit.userID;
+  } else {
+    userID = crypto.randomUUID();
+  }
+  const result = await sqlInsert(
+    `INSERT INTO visit (date_time, user_id, user_device, user_browser) VALUES (?) `,
+    [
+      formatDateTime(today.toISOString()),
+      userID,
+      visit.userDevice,
+      visit.userBrowser,
+    ]
+  );
+  if (result) {
+    return userID;
+  } else {
+    return visit.userID;
+  }
+}
+
+async function getVisits(query) {
+  const visits = await sqlSelect(
+    `SELECT COUNT(id) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+      query.startDate
+    )}' AND '${formatDateTime(query.endDate)}';`
+  );
+  const users = await sqlSelect(
+    `SELECT COUNT(DISTINCT user_id) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+      query.startDate
+    )}' AND '${formatDateTime(query.endDate)}';`
+  );
+  const devices = await sqlSelect(
+    `SELECT user_device, COUNT(*) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+      query.startDate
+    )}' AND '${formatDateTime(query.endDate)}' GROUP BY user_device;`
+  );
+  const browsers = await sqlSelect(
+    `SELECT user_browser, COUNT(*) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+      query.startDate
+    )}' AND '${formatDateTime(query.endDate)}' GROUP BY user_browser;`
+  );
+
+  const statistic = new Statistics();
+  statistic.Visits = visits[0].value;
+  statistic.Users = users[0].value;
+  statistic.Devices = devices;
+  statistic.Browsers = browsers;
+
+  return statistic;
+}
+
 async function addCoupon(coupon) {
   return await sqlInsert(
-    `INSERT INTO coupon (code, uses, expired, redirects, created, skips, active) VALUES (?) `,
+    `INSERT INTO coupon (code, uses, expired, created, skips, active) VALUES (?) `,
     [
       coupon.code,
       coupon.uses,
       formatDateTime(coupon.expired),
-      coupon.redirects,
       formatDateTime(coupon.created),
       0,
       coupon.active,
@@ -468,4 +524,6 @@ module.exports = {
   chooseRedirectCoupon,
   getPageConfigs,
   updatePageConfigs,
+  addVisit,
+  getVisits,
 };

@@ -1,4 +1,4 @@
-// replace with real domain
+// replace with real values
 const apiURL = "http://localhost:3000";
 const publicKey = "devkey";
 
@@ -9,6 +9,13 @@ class PageConfigs {
   image = "";
   text = "";
   textColor = "";
+}
+
+class Visit {
+  dateTime = null;
+  userID = null;
+  userDevice = null;
+  userBrowser = null;
 }
 
 let targetURL;
@@ -130,6 +137,72 @@ async function instagramBrowserAdapt() {
   }
 }
 
+async function registerVisit() {
+  const visit = new Visit();
+
+  if (typeof Storage !== "undefined") {
+    const userID = localStorage.getItem("userID");
+    if (userID && userID != undefined) {
+      visit.userID = userID;
+    }
+  }
+
+  const userAgentInfo = navigator.userAgent;
+
+  if (userAgentInfo.toLowerCase().indexOf("iphone") >= 0) {
+    visit.userDevice = "iphone";
+  } else if (userAgentInfo.toLowerCase().indexOf("ipad") >= 0) {
+    visit.userDevice = "ipad";
+  } else if (userAgentInfo.toLowerCase().indexOf("mac os") >= 0) {
+    visit.userDevice = "mac";
+  } else if (userAgentInfo.toLowerCase().indexOf("android") >= 0) {
+    visit.userDevice = "android";
+  } else if (userAgentInfo.toLowerCase().indexOf("linux") >= 0) {
+    visit.userDevice = "linux";
+  } else if (userAgentInfo.toLowerCase().indexOf("windows") >= 0) {
+    visit.userDevice = "windows";
+  }
+
+  if (userAgentInfo.toLowerCase().indexOf("instagram") >= 0) {
+    visit.userBrowser = "instagram";
+  } else if (
+    userAgentInfo.toLowerCase().indexOf("safari") >= 0 &&
+    (userAgentInfo.toLowerCase().indexOf("ipad") >= 0 ||
+      userAgentInfo.toLowerCase().indexOf("mac os") >= 0 ||
+      userAgentInfo.toLowerCase().indexOf("macintosh") >= 0)
+  ) {
+    visit.userBrowser = "safari";
+  } else if (userAgentInfo.toLowerCase().indexOf("edg") >= 0) {
+    visit.userBrowser = "edge";
+  } else if (userAgentInfo.toLowerCase().indexOf("chrome") >= 0) {
+    visit.userBrowser = "chrome";
+  } else if (userAgentInfo.toLowerCase().indexOf("firefox") >= 0) {
+    visit.userBrowser = "firefox";
+  }
+
+  const defaultHeader = new Headers();
+  defaultHeader.append("Content-Type", "application/json");
+  const requestJSON = JSON.stringify(visit);
+
+  const requestOptions = {
+    method: "POST",
+    headers: defaultHeader,
+    body: requestJSON,
+    redirect: "follow",
+  };
+
+  const result = await fetch(
+    `${apiURL}/visit/add?publickey=${publicKey}`,
+    requestOptions
+  );
+  const resultResponse = await result.json();
+  if (resultResponse && resultResponse != visit.userID) {
+    if (typeof Storage !== "undefined") {
+      localStorage.setItem("userID", resultResponse);
+    }
+  }
+}
+
 async function startup() {
   if (
     navigator.userAgent.includes("Instagram") &&
@@ -149,6 +222,8 @@ async function startup() {
     await getCoupon();
     applyPageConfigs();
   }
+
+  registerVisit();
 }
 
 startup();

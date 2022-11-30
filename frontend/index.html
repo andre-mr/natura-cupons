@@ -13,10 +13,11 @@
   <body>
     <header id="headerSection" class="hidden">
       <select id="sectionSelector">
-        <option selected value="coupons">Cupons</option>
+        <option selected value="active">Ativos</option>
         <option value="inactive">Inativos</option>
         <option value="settings">Configurações</option>
         <option value="page">Página</option>
+        <option value="statistics">Estatísticas</option>
       </select>
       <div id="logoutButton" class="defaultButton cancelButton">Sair</div>
     </header>
@@ -29,7 +30,6 @@
               <option value="code">Código</option>
               <option selected value="uses">Disponíveis</option>
               <option value="expired">Validade</option>
-              <option value="redirects">Acessos</option>
               <option value="created">Registro</option>
             </select>
             <svg
@@ -63,10 +63,6 @@
             <p>Disponíveis:</p>
             <p id="usesCount">00</p>
           </div>
-          <div class="headerText countContainer">
-            <p>Acessos:</p>
-            <p id="redirectsCount">00</p>
-          </div>
           <div id="addCouponButton" class="defaultButton primaryButton">
             ADICIONAR
           </div>
@@ -93,14 +89,6 @@
                   <input
                     class="liTextDateExpired liTextDate editCouponInput listCouponInput"
                     type="date"
-                  />
-                </div>
-                <div class="liTextUsesContainer">
-                  <p class="liTextDateText">Acessos</p>
-                  <input
-                    class="liTextRedirects liTextBig editCouponInput listCouponInput cursorDefault"
-                    type="number"
-                    disabled
                   />
                 </div>
                 <div class="liTextDateContainer">
@@ -273,7 +261,6 @@
             </div>
           </div>
         </div>
-        <hr />
         <div id="pagePreview">
           <div id="pagePreviewContainer">
             <div id="pagePreviewTopImageContainer">
@@ -310,6 +297,102 @@
           </div>
         </div>
       </div>
+      <div id="statisticsSection" class="hidden">
+        <div id="statisticsTitle" class="liTextBig text">
+          Estatísticas de visitação
+        </div>
+        <div id="statisticsMenu">
+          <input
+            type="date"
+            id="startDateField"
+            class="liTextDateExpired liTextDate editCouponInput listCouponInput"
+            title="Data inicial"
+          />
+          <input
+            type="date"
+            id="endDateField"
+            class="liTextDateExpired liTextDate editCouponInput listCouponInput"
+            title="Data final"
+          />
+          <div id="statisticsSearchButton" class="defaultButton primaryButton">
+            Pesquisar
+          </div>
+        </div>
+        <div class="statisticsBlock">
+          <div class="statisticsLineTop">
+            <p class="liTextBig text">Total de visitas:</p>
+            <p id="statisticsVisits" class="">00</p>
+          </div>
+          <div class="statisticsLineTop">
+            <p class="liTextBig text">Usuários únicos:</p>
+            <p id="statisticsUsers" class="">00</p>
+          </div>
+        </div>
+        <div class="statisticsBlock">
+          <div class="statisticsColumn">
+            <div class="statisticsLineBottom">
+              <div class="statisticsLineItem">
+                <p class="configText liTextBig text">Dispositivos</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">iPhone/iPad:</p>
+                <p id="statisticsIOS" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Android:</p>
+                <p id="statisticsAndroid" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Windows:</p>
+                <p id="statisticsWindows" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Mac:</p>
+                <p id="statisticsMac" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Linux:</p>
+                <p id="statisticsLinux" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Outros:</p>
+                <p id="statisticsOtherDevices" class="">00</p>
+              </div>
+            </div>
+          </div>
+          <div class="statisticsColumn">
+            <div class="statisticsLineBottom">
+              <div class="statisticsLineItem">
+                <p class="configText liTextBig text">Navegadores</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Instagram:</p>
+                <p id="statisticsInstagram" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Chrome:</p>
+                <p id="statisticsChrome" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Safari:</p>
+                <p id="statisticsSafari" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Edge:</p>
+                <p id="statisticsEdge" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Firefox:</p>
+                <p id="statisticsFirefox" class="">00</p>
+              </div>
+              <div class="statisticsLineItem">
+                <p class="configText">Outros:</p>
+                <p id="statisticsOtherBrowsers" class="">00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <div id="modalBackground" class="hidden"></div>
@@ -329,18 +412,6 @@
         <div class="modalLine">
           <p class="modalText">Validade:</p>
           <input id="editCouponExpired" class="editCouponInput" type="date" />
-        </div>
-        <div class="modalLine">
-          <p class="modalText">Acessos:</p>
-          <input
-            id="editCouponRedirects"
-            class="editCouponInput"
-            type="number"
-            step="1"
-            min="0"
-            value="10"
-            disabled
-          />
         </div>
         <div class="modalLine">
           <p class="modalText">Utilizações:</p>

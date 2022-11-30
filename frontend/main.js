@@ -1,10 +1,11 @@
 // replace with real domain
-const backendURL = "http://localhost:3000";
+const apiURL = "http://localhost:3000";
 
 const sectionSelector = document.getElementById("sectionSelector");
 const listSection = document.getElementById("listSection");
 const configSection = document.getElementById("configSection");
 const pageSection = document.getElementById("pageSection");
+const statisticsSection = document.getElementById("statisticsSection");
 const liItemTemplate = document.getElementById("liItemTemplate");
 const couponsSort = document.getElementById("couponsSort");
 const arrowUp = document.getElementById("arrowUp");
@@ -16,7 +17,6 @@ const removeModal = document.getElementById("removeModal");
 const editCouponCode = document.getElementById("editCouponCode");
 const editCouponCreated = document.getElementById("editCouponCreated");
 const editCouponExpired = document.getElementById("editCouponExpired");
-const editCouponRedirects = document.getElementById("editCouponRedirects");
 const editCouponUses = document.getElementById("editCouponUses");
 const modalEditCancelButton = document.getElementById("modalEditCancelButton");
 const modalRemoveCancelButton = document.getElementById(
@@ -27,7 +27,6 @@ const modalRemoveButton = document.getElementById("modalRemoveButton");
 const addCouponButton = document.getElementById("addCouponButton");
 const couponsCount = document.getElementById("couponsCount");
 const usesCount = document.getElementById("usesCount");
-const redirectsCount = document.getElementById("redirectsCount");
 const configAlertRemainingUses = document.getElementById(
   "configAlertRemainingUses"
 );
@@ -78,6 +77,11 @@ const pageConfigsResetButton = document.getElementById(
 const pageConfigsUpdateButton = document.getElementById(
   "pageConfigsUpdateButton"
 );
+const statisticsSearchButton = document.getElementById(
+  "statisticsSearchButton"
+);
+const startDateField = document.getElementById("startDateField");
+const endDateField = document.getElementById("endDateField");
 
 sectionSelector.addEventListener("change", changeSection);
 couponsSort.addEventListener("change", changeCouponsSort);
@@ -108,6 +112,7 @@ pageConfigsBackgroundColor.addEventListener(
 pageConfigsButtonColor.addEventListener("input", changePageConfigsButtonColor);
 pageConfigsResetButton.addEventListener("click", pageConfigsResetForm);
 pageConfigsUpdateButton.addEventListener("click", pageConfigsUpdateConfigs);
+statisticsSearchButton.addEventListener("click", getStatistics);
 
 class CouponsConfigs {
   alertRemainingUses = 5;
@@ -133,18 +138,31 @@ let sort = "uses";
 let sortASC = 1;
 let selectedCoupon;
 let apikey;
-let autoUpdateTimer = 0;
-let autoUpdateRunning = false;
+let autoUpdateCouponsTimer = 0;
+let autoUpdateStatisticsTimer = 0;
+let autoUpdateCouponsRunning = false;
+let autoUpdateStatisticsRunning = false;
 
-const autoUpdateLoop = setInterval(async () => {
-  if (autoUpdateRunning) {
-    if (autoUpdateTimer <= 0) {
+const autoUpdateCouponsLoop = setInterval(async () => {
+  if (autoUpdateCouponsRunning) {
+    if (autoUpdateCouponsTimer <= 0) {
       await getCouponsActive();
       sortCoupons();
       populateCouponsList();
-      resetAutoUpdateTimer();
+      resetAutoUpdateCouponsTimer();
     } else {
-      autoUpdateTimer--;
+      autoUpdateCouponsTimer--;
+    }
+  }
+}, 1000);
+
+const autoUpdateStatisticsLoop = setInterval(async () => {
+  if (autoUpdateStatisticsRunning) {
+    if (autoUpdateStatisticsTimer <= 0) {
+      await getStatistics();
+      resetAutoUpdateStatisticsTimer();
+    } else {
+      autoUpdateStatisticsTimer--;
     }
   }
 }, 1000);
@@ -195,7 +213,7 @@ async function pageConfigsUpdateConfigs() {
     redirect: "follow",
   };
 
-  fetch(`${backendURL}/configs/page/update?apikey=${apikey}`, requestOptions)
+  fetch(`${apiURL}/configs/page/update?apikey=${apikey}`, requestOptions)
     .then(async (response) => {
       window.alert("Configurações atualizadas!");
       await pageConfigsResetForm();
@@ -251,8 +269,12 @@ async function changeImageSelected(e) {
   reader.readAsDataURL(e.target.files[0]);
 }
 
-function resetAutoUpdateTimer() {
-  autoUpdateTimer = couponsConfigs.autoUpdateInterval * 60;
+function resetAutoUpdateCouponsTimer() {
+  autoUpdateCouponsTimer = couponsConfigs.autoUpdateInterval * 60;
+}
+
+function resetAutoUpdateStatisticsTimer() {
+  autoUpdateStatisticsTimer = couponsConfigs.autoUpdateInterval * 60;
 }
 
 async function highlightChange(element) {
@@ -300,39 +322,69 @@ async function userLogout() {
 }
 
 async function login() {
-  const result = await fetch(`${backendURL}/login?apikey=${apikey}`);
+  const result = await fetch(`${apiURL}/login?apikey=${apikey}`);
   return await result.json();
 }
 
 async function changeSection(e) {
   switch (e.target.value) {
-    case "coupons":
+    case "active":
       showListSection();
       await getCouponsActive();
       populateCouponsList();
       sortCoupons();
-      autoUpdateRunning = true;
+      autoUpdateCouponsRunning = true;
+      autoUpdateStatisticsRunning = false;
       break;
     case "inactive":
       showListSection();
       await getCouponsInactive();
       populateCouponsList();
       sortCoupons();
-      autoUpdateRunning = false;
+      autoUpdateCouponsRunning = false;
+      autoUpdateStatisticsRunning = false;
       break;
     case "settings":
       showConfigSection();
       await getCouponsConfigs();
       populateConfigs();
-      autoUpdateRunning = false;
+      autoUpdateCouponsRunning = false;
+      autoUpdateStatisticsRunning = false;
       break;
     case "page":
       showPageSection();
       await getPageConfigs();
       applyPagePreview();
-      autoUpdateRunning = false;
+      autoUpdateCouponsRunning = false;
+      autoUpdateStatisticsRunning = false;
+      break;
+    case "statistics":
+      showStatisticsSection();
+      const start = new Date();
+      start.setDate(1);
+      start.setHours(0, 0, 0);
+      startDateField.value = formatDateUS(start);
+      endDateField.value = formatDateUS(new Date());
+      await getStatistics();
+      autoUpdateCouponsRunning = false;
+      autoUpdateStatisticsRunning = true;
       break;
   }
+}
+
+async function showStatisticsSection() {
+  statisticsSection.classList.contains("hidden")
+    ? statisticsSection.classList.remove("hidden")
+    : null;
+  !configSection.classList.contains("hidden")
+    ? configSection.classList.add("hidden")
+    : null;
+  !listSection.classList.contains("hidden")
+    ? listSection.classList.add("hidden")
+    : null;
+  !pageSection.classList.contains("hidden")
+    ? pageSection.classList.add("hidden")
+    : null;
 }
 
 async function resetConfigs() {
@@ -354,7 +406,7 @@ async function updateConfigs() {
       redirect: "follow",
     };
 
-    fetch(`${backendURL}/login/update?apikey=${apikey}`, requestOptions)
+    fetch(`${apiURL}/login/update?apikey=${apikey}`, requestOptions)
       .then(async (response) => {
         window.alert("Configurações atualizadas!");
         apikey = configApikey.value;
@@ -401,10 +453,7 @@ async function updateConfigs() {
       redirect: "follow",
     };
 
-    fetch(
-      `${backendURL}/configs/coupons/update?apikey=${apikey}`,
-      requestOptions
-    )
+    fetch(`${apiURL}/configs/coupons/update?apikey=${apikey}`, requestOptions)
       .then(async (response) => {
         window.alert("Configurações atualizadas!");
         await getCouponsConfigs();
@@ -448,7 +497,7 @@ async function updateCoupon(e) {
       };
 
       const result = await fetch(
-        `${backendURL}/coupons/update?apikey=${apikey}`,
+        `${apiURL}/coupons/update?apikey=${apikey}`,
         requestOptions
       );
     } else {
@@ -458,7 +507,6 @@ async function updateCoupon(e) {
       selectedCoupon.expired = editCouponExpired.value
         ? new Date(editCouponExpired.value)
         : null;
-      selectedCoupon.redirects = editCouponRedirects.value;
       selectedCoupon.uses = editCouponUses.value;
       const today = new Date();
       if (selectedCoupon.expired < today) {
@@ -479,7 +527,7 @@ async function updateCoupon(e) {
       };
 
       const result = await fetch(
-        `${backendURL}/coupons/add?apikey=${apikey}`,
+        `${apiURL}/coupons/add?apikey=${apikey}`,
         requestOptions
       );
       hideModal();
@@ -506,7 +554,7 @@ async function deleteCoupon() {
   };
 
   const result = await fetch(
-    `${backendURL}/coupons/delete?apikey=${apikey}`,
+    `${apiURL}/coupons/delete?apikey=${apikey}`,
     requestOptions
   );
 
@@ -573,17 +621,6 @@ function sortCoupons() {
         return 0;
       });
       break;
-    case "redirects":
-      coupons.sort((a, b) => {
-        if (a.redirects > b.redirects) {
-          return sortASC;
-        }
-        if (a.redirects < b.redirects) {
-          return -sortASC;
-        }
-        return 0;
-      });
-      break;
     case "uses":
       coupons.sort((a, b) => {
         if (a.uses > b.uses) {
@@ -609,6 +646,9 @@ function showListSection() {
   !pageSection.classList.contains("hidden")
     ? pageSection.classList.add("hidden")
     : null;
+  !statisticsSection.classList.contains("hidden")
+    ? statisticsSection.classList.add("hidden")
+    : null;
 }
 
 function showConfigSection() {
@@ -620,6 +660,9 @@ function showConfigSection() {
     : null;
   !pageSection.classList.contains("hidden")
     ? pageSection.classList.add("hidden")
+    : null;
+  !statisticsSection.classList.contains("hidden")
+    ? statisticsSection.classList.add("hidden")
     : null;
 }
 
@@ -633,11 +676,14 @@ function showPageSection() {
   !configSection.classList.contains("hidden")
     ? configSection.classList.add("hidden")
     : null;
+  !statisticsSection.classList.contains("hidden")
+    ? statisticsSection.classList.add("hidden")
+    : null;
 }
 
 async function getCouponsActive() {
   coupons = [];
-  const result = await fetch(`${backendURL}/coupons/active?apikey=${apikey}`);
+  const result = await fetch(`${apiURL}/coupons/active?apikey=${apikey}`);
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
@@ -648,7 +694,7 @@ async function getCouponsActive() {
 
 async function getCouponsInactive() {
   coupons = [];
-  const result = await fetch(`${backendURL}/coupons/inactive?apikey=${apikey}`);
+  const result = await fetch(`${apiURL}/coupons/inactive?apikey=${apikey}`);
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
@@ -658,26 +704,129 @@ async function getCouponsInactive() {
 }
 
 async function getCouponsConfigs() {
-  const result = await fetch(`${backendURL}/configs/coupons?apikey=${apikey}`);
+  const result = await fetch(`${apiURL}/configs/coupons?apikey=${apikey}`);
   const resultJSON = await result.json();
   couponsConfigs = JSON.parse(JSON.stringify(resultJSON));
 }
 
 async function getPageConfigs() {
-  const result = await fetch(`${backendURL}/configs/page?apikey=${apikey}`);
+  const result = await fetch(`${apiURL}/configs/page?apikey=${apikey}`);
   const resultJSON = await result.json();
   pageConfigs = JSON.parse(JSON.stringify(resultJSON));
 }
 
+async function getStatistics() {
+  document.getElementById("statisticsIOS").innerText = "0";
+  document.getElementById("statisticsAndroid").innerText = "0";
+  document.getElementById("statisticsWindows").innerText = "0";
+  document.getElementById("statisticsMac").innerText = "0";
+  document.getElementById("statisticsLinux").innerText = "0";
+  document.getElementById("statisticsOtherDevices").innerText = "0";
+
+  document.getElementById("statisticsInstagram").innerText = "0";
+  document.getElementById("statisticsChrome").innerText = "0";
+  document.getElementById("statisticsSafari").innerText = "0";
+  document.getElementById("statisticsEdge").innerText = "0";
+  document.getElementById("statisticsFirefox").innerText = "0";
+  document.getElementById("statisticsOtherBrowsers").innerText = "0";
+
+  let startDate, endDate;
+
+  startDate = new Date(startDateField.value + "T00:00:00");
+  endDate = new Date(endDateField.value + "T23:59:59");
+
+  if (!startDate) {
+    startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+  }
+  if (!endDate) {
+    endDate = new Date();
+  }
+
+  const result = await fetch(
+    `${apiURL}/visit/all?apikey=${apikey}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+  );
+  const statistics = await result.json();
+
+  document.getElementById("statisticsVisits").innerText = statistics.Visits
+    ? Number.parseInt(statistics.Visits).toLocaleString()
+    : "0";
+  document.getElementById("statisticsUsers").innerText = statistics.Users
+    ? Number.parseInt(statistics.Users).toLocaleString()
+    : "0";
+
+  for (const device of statistics.Devices) {
+    if (device.user_device == "iphone" || device.user_device == "ipad") {
+      document.getElementById("statisticsIOS").innerText = Number.parseInt(
+        device.value
+      ).toLocaleString();
+    }
+    if (device.user_device == "android") {
+      document.getElementById("statisticsAndroid").innerText = Number.parseInt(
+        device.value
+      ).toLocaleString();
+    }
+    if (device.user_device == "windows") {
+      document.getElementById("statisticsWindows").innerText = Number.parseInt(
+        device.value
+      ).toLocaleString();
+    }
+    if (device.user_device == "mac") {
+      document.getElementById("statisticsMac").innerText = Number.parseInt(
+        device.value
+      ).toLocaleString();
+    }
+    if (device.user_device == "linux") {
+      document.getElementById("statisticsLinux").innerText = Number.parseInt(
+        device.value
+      ).toLocaleString();
+    }
+    if (!device.user_device || device.user_device == "") {
+      document.getElementById("statisticsOtherDevices").innerText = device.value
+        ? Number.parseInt(device.value).toLocaleString()
+        : "0";
+    }
+  }
+
+  for (const browser of statistics.Browsers) {
+    if (browser.user_browser == "instagram") {
+      document.getElementById("statisticsInstagram").innerText =
+        Number.parseInt(browser.value).toLocaleString();
+    }
+    if (browser.user_browser == "chrome") {
+      document.getElementById("statisticsChrome").innerText = Number.parseInt(
+        browser.value
+      ).toLocaleString();
+    }
+    if (browser.user_browser == "safari") {
+      document.getElementById("statisticsSafari").innerText = Number.parseInt(
+        browser.value
+      ).toLocaleString();
+    }
+    if (browser.user_browser == "edge") {
+      document.getElementById("statisticsEdge").innerText = Number.parseInt(
+        browser.value
+      ).toLocaleString();
+    }
+    if (browser.user_browser == "firefox") {
+      document.getElementById("statisticsFirefox").innerText = Number.parseInt(
+        browser.value
+      ).toLocaleString();
+    }
+    if (!browser.user_browser || browser.user_browser == "") {
+      document.getElementById("statisticsOtherBrowsers").innerText =
+        browser.value ? Number.parseInt(browser.value).toLocaleString() : "0";
+    }
+  }
+}
+
 function populateCouponsList() {
   couponsCount.innerText = coupons.length;
-  let totalUses = (totalRedirects = 0);
+  let totalUses = 0;
   for (const coupon of coupons) {
     totalUses += coupon.uses;
-    totalRedirects += coupon.redirects;
   }
   usesCount.innerText = totalUses;
-  redirectsCount.innerText = totalRedirects;
   couponsList.innerHTML = null;
 
   for (const coupon of coupons) {
@@ -714,9 +863,6 @@ function populateCouponsList() {
     newItem
       .querySelector(".liTextDateExpired")
       .addEventListener("focusout", changeExpiredValue);
-    newItem.querySelector(".liTextRedirects").value = `${
-      coupon.redirects >= 0 ? coupon.redirects : 0
-    }`;
     newItem.querySelector(".liTextUses").value = `${coupon.uses}`;
     if (coupon.uses <= couponsConfigs.alertRemainingUses) {
       !newItem.querySelector(".liTextUses").classList.contains("textDanger")
@@ -836,10 +982,7 @@ function showEditModal(e) {
   expiredDate.setDate(
     expiredDate.getDate() + Number.parseInt(couponsConfigs.expiredDays)
   );
-  console.log(expiredDate.toDateString());
-  console.log(expiredDate);
   editCouponExpired.value = formatDateUS(expiredDate);
-  editCouponRedirects.value = 0;
   editCouponUses.value = couponsConfigs.couponUses;
   editCouponCode.focus();
 }
@@ -914,9 +1057,9 @@ async function startup() {
   populatePageConfigs();
   sortCoupons();
   populateCouponsList();
-  window.addEventListener("keypress", resetAutoUpdateTimer);
-  resetAutoUpdateTimer();
-  autoUpdateRunning = true;
+  window.addEventListener("keypress", resetAutoUpdateCouponsTimer);
+  resetAutoUpdateCouponsTimer();
+  autoUpdateCouponsRunning = true;
 }
 
 function populateConfigs() {
