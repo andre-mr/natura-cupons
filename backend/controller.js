@@ -171,7 +171,10 @@ async function addVisit(req) {
   if (req.body.userID) {
     userID = req.body.userID;
   } else {
-    userID = crypto.randomUUID();
+    userID =
+      (req.body.subsystem ? req.body.subsystem : "default") +
+      "-" +
+      crypto.randomUUID();
   }
   const result = await sqlInsert(
     `INSERT INTO visit (subsystem, date_time, user_id, user_device, user_browser) VALUES (?); SELECT LAST_INSERT_ID();`,

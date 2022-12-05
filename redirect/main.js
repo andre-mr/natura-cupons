@@ -147,7 +147,11 @@ async function registerVisit() {
   let userID;
   if (typeof Storage !== "undefined") {
     userID = localStorage.getItem("userID");
-    if (userID && userID != undefined) {
+    if (
+      userID &&
+      userID != undefined &&
+      (userID.indexOf(subsystem) >= 0 || subsystem == "default")
+    ) {
       visit.userID = userID;
     }
   }
