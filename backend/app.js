@@ -16,7 +16,7 @@ app.get("/", async (req, res) => {
   if (req.query.publickey == process.env.PUBLIC_KEY) {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.write(JSON.stringify(await controller.chooseRedirectCoupon()));
+    res.write(JSON.stringify(await controller.chooseRedirectCoupon(req.query)));
     res.send();
   } else {
     res.statusCode = 200;
@@ -36,7 +36,7 @@ app.get("/configs/page", async (req, res) => {
 app.post("/visit/add", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await controller.addVisit(req.body)));
+  res.write(JSON.stringify(await controller.addVisit(req)));
   res.send();
 });
 
@@ -69,14 +69,14 @@ app.get("/login", async (req, res) => {
 app.get("/coupons/active", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await controller.getCouponsActive()));
+  res.write(JSON.stringify(await controller.getCouponsActive(req.query)));
   res.send();
 });
 
 app.get("/coupons/inactive", async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.write(JSON.stringify(await controller.getCouponsInactive()));
+  res.write(JSON.stringify(await controller.getCouponsInactive(req.query)));
   res.send();
 });
 

@@ -78,9 +78,9 @@ async function uploadImage(imageB64) {
   return imageB64;
 }
 
-async function chooseRedirectCoupon() {
+async function chooseRedirectCoupon(query) {
   const configs = await getCouponsConfigs();
-  const coupons = await getCouponsActive();
+  const coupons = await getCouponsActive(query);
 
   if (!coupons) return null;
 
@@ -165,48 +165,57 @@ async function chooseRedirectCoupon() {
   }
 }
 
-async function addVisit(visit) {
+async function addVisit(req) {
   const today = new Date();
   let userID;
-  if (visit.userID) {
-    userID = visit.userID;
+  if (req.body.userID) {
+    userID = req.body.userID;
   } else {
     userID = crypto.randomUUID();
   }
   const result = await sqlInsert(
-    `INSERT INTO visit (date_time, user_id, user_device, user_browser) VALUES (?) `,
+    `INSERT INTO visit (subsystem, date_time, user_id, user_device, user_browser) VALUES (?); SELECT LAST_INSERT_ID();`,
     [
+      req.body.subsystem ? req.body.subsystem : "default",
       formatDateTime(today.toISOString()),
       userID,
-      visit.userDevice,
-      visit.userBrowser,
+      req.body.userDevice,
+      req.body.userBrowser,
     ]
   );
   if (result) {
     return userID;
   } else {
-    return visit.userID;
+    return req.body.userID;
   }
 }
 
 async function getVisits(query) {
   const visits = await sqlSelect(
-    `SELECT COUNT(id) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+    `SELECT COUNT(id) AS value FROM visit WHERE subsystem = '${
+      query.subsystem ? query.subsystem : "default"
+    }' AND visit.date_time BETWEEN '${formatDateTime(
       query.startDate
     )}' AND '${formatDateTime(query.endDate)}';`
   );
   const users = await sqlSelect(
-    `SELECT COUNT(DISTINCT user_id) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+    `SELECT COUNT(DISTINCT user_id) AS value FROM visit WHERE subsystem = '${
+      query.subsystem ? query.subsystem : "default"
+    }' AND visit.date_time BETWEEN '${formatDateTime(
       query.startDate
     )}' AND '${formatDateTime(query.endDate)}';`
   );
   const devices = await sqlSelect(
-    `SELECT user_device, COUNT(*) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+    `SELECT user_device, COUNT(*) AS value FROM visit WHERE subsystem = '${
+      query.subsystem ? query.subsystem : "default"
+    }' AND visit.date_time BETWEEN '${formatDateTime(
       query.startDate
     )}' AND '${formatDateTime(query.endDate)}' GROUP BY user_device;`
   );
   const browsers = await sqlSelect(
-    `SELECT user_browser, COUNT(*) AS value FROM visit WHERE visit.date_time BETWEEN '${formatDateTime(
+    `SELECT user_browser, COUNT(*) AS value FROM visit WHERE subsystem = '${
+      query.subsystem ? query.subsystem : "default"
+    }' AND visit.date_time BETWEEN '${formatDateTime(
       query.startDate
     )}' AND '${formatDateTime(query.endDate)}' GROUP BY user_browser;`
   );
@@ -222,8 +231,9 @@ async function getVisits(query) {
 
 async function addCoupon(coupon) {
   return await sqlInsert(
-    `INSERT INTO coupon (code, uses, expired, created, skips, active) VALUES (?) `,
+    `INSERT INTO coupon (subsystem, code, uses, expired, created, skips, active) VALUES (?) `,
     [
+      coupon.subsystem ? coupon.subsystem : "default",
       coupon.code,
       coupon.uses,
       formatDateTime(coupon.expired),
@@ -276,15 +286,18 @@ async function updateApikey(apikey) {
   return await sqlUpdateOrDelete(sql, values);
 }
 
-async function getCouponsActive() {
+async function getCouponsActive(query) {
   return sqlSelect(
     `SELECT * 
-    FROM coupon WHERE active = 1 
-    ORDER BY id ASC;`
+      FROM coupon WHERE active = 1 
+      AND subsystem = '${
+        query && query.subsystem ? query.subsystem : "default"
+      }' 
+      ORDER BY id ASC;`
   );
 }
 
-async function getCouponsInactive() {
+async function getCouponsInactive(query) {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 1);
   const dateFormatted = `${date.getFullYear()}-${(date.getMonth() + 1)
@@ -292,8 +305,11 @@ async function getCouponsInactive() {
     .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
   return sqlSelect(
     `SELECT * 
-    FROM coupon WHERE active = 0 AND created > '${dateFormatted}' 
-    ORDER BY id ASC;`
+      FROM coupon WHERE active = 0 AND created > '${dateFormatted}' 
+      AND subsystem = '${
+        query && query.subsystem ? query.subsystem : "default"
+      }' 
+      ORDER BY id ASC;`
   );
 }
 
@@ -448,6 +464,7 @@ async function sqlInsert(insertStatement, values) {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+    multipleStatements: true,
   });
 
   await connection.query(insertStatement, [values], (err) => {

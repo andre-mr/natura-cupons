@@ -1,6 +1,7 @@
 // replace with real values
 const apiURL = "http://localhost:3000";
 const publicKey = "devkey";
+const subsystem = "default";
 
 class PageConfigs {
   backgroundColor = "";
@@ -55,7 +56,9 @@ codeButton.addEventListener("click", goProduct);
 
 async function getCoupon() {
   if (targetURL) {
-    const result = await fetch(`${apiURL}?publickey=${publicKey}`);
+    const result = await fetch(
+      `${apiURL}?publickey=${publicKey}&subsystem=${subsystem}`
+    );
     couponCode = await result.json();
     couponCodeText.innerText = couponCode;
   } else {
@@ -139,9 +142,11 @@ async function instagramBrowserAdapt() {
 
 async function registerVisit() {
   const visit = new Visit();
+  visit.subsystem = subsystem;
 
+  let userID;
   if (typeof Storage !== "undefined") {
-    const userID = localStorage.getItem("userID");
+    userID = localStorage.getItem("userID");
     if (userID && userID != undefined) {
       visit.userID = userID;
     }
@@ -197,7 +202,7 @@ async function registerVisit() {
   };
 
   const result = await fetch(
-    `${apiURL}/visit/add?publickey=${publicKey}`,
+    `${apiURL}/visit/add?publickey=${publicKey}&subsystem=${subsystem}`,
     requestOptions
   );
   const resultResponse = await result.json();
@@ -205,6 +210,7 @@ async function registerVisit() {
     if (typeof Storage !== "undefined") {
       localStorage.setItem("userID", resultResponse);
     }
+    userID = resultResponse;
   }
 }
 

@@ -1,5 +1,6 @@
 // replace with real domain
 const apiURL = "http://localhost:3000";
+const subsystem = "default";
 
 const sectionSelector = document.getElementById("sectionSelector");
 const listSection = document.getElementById("listSection");
@@ -502,6 +503,7 @@ async function updateCoupon(e) {
       );
     } else {
       selectedCoupon = {};
+      selectedCoupon.subsystem = subsystem;
       selectedCoupon.code = editCouponCode.value;
       selectedCoupon.created = new Date(editCouponCreated.value);
       selectedCoupon.expired = editCouponExpired.value
@@ -683,7 +685,9 @@ function showPageSection() {
 
 async function getCouponsActive() {
   coupons = [];
-  const result = await fetch(`${apiURL}/coupons/active?apikey=${apikey}`);
+  const result = await fetch(
+    `${apiURL}/coupons/active?apikey=${apikey}&subsystem=${subsystem}`
+  );
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
@@ -694,7 +698,9 @@ async function getCouponsActive() {
 
 async function getCouponsInactive() {
   coupons = [];
-  const result = await fetch(`${apiURL}/coupons/inactive?apikey=${apikey}`);
+  const result = await fetch(
+    `${apiURL}/coupons/inactive?apikey=${apikey}&subsystem=${subsystem}`
+  );
   const resultJSON = await result.json();
   for (const item of resultJSON) {
     item.created = new Date(item.created);
@@ -744,7 +750,7 @@ async function getStatistics() {
   }
 
   const result = await fetch(
-    `${apiURL}/visit/all?apikey=${apikey}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+    `${apiURL}/visit/all?apikey=${apikey}&subsystem=${subsystem}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
   );
   const statistics = await result.json();
 

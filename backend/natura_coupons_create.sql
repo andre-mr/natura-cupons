@@ -16,6 +16,7 @@ CREATE TABLE
 CREATE TABLE
     `coupon` (
         `id` int NOT NULL AUTO_INCREMENT,
+        `subsystem` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `code` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
         `uses` int NOT NULL,
         `expired` date DEFAULT NULL,
@@ -24,7 +25,7 @@ CREATE TABLE
         `skips` int NOT NULL DEFAULT '0',
         `active` tinyint NOT NULL DEFAULT '1',
         PRIMARY KEY (`id`)
-    ) ENGINE = InnoDB AUTO_INCREMENT = 18 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    ) ENGINE = InnoDB AUTO_INCREMENT = 20 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE
     `user` (
@@ -37,9 +38,10 @@ CREATE TABLE
 CREATE TABLE
     `visit` (
         `id` int NOT NULL AUTO_INCREMENT,
+        `subsystem` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `date_time` datetime NOT NULL,
         `user_id` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `user_device` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `user_browser` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         PRIMARY KEY (`id`)
-    ) ENGINE = InnoDB AUTO_INCREMENT = 244 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    ) ENGINE = InnoDB AUTO_INCREMENT = 289 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
