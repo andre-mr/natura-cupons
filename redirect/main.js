@@ -27,17 +27,22 @@ if (!params) {
 }
 
 if (params) {
-  targetURL = params.get("url");
-} else {
-  targetURL = window.location.href.substring(
-    window.location.href.indexOf("url=") + 4,
-    window.location.href.length
-  );
+  targetURL =
+    window.location.href.indexOf("url=") > 0
+      ? window.location.href.substring(
+          window.location.href.indexOf("url=") + 4,
+          window.location.href.length
+        )
+      : null;
+
   if (!targetURL) {
-    targetURL = document.location.href.substring(
-      document.location.href.indexOf("url=") + 4,
-      document.location.href.length
-    );
+    targetURL =
+      document.location.href.indexOf("url=") > 0
+        ? document.location.href.substring(
+            document.location.href.indexOf("url=") + 4,
+            document.location.href.length
+          )
+        : null;
   }
 }
 
