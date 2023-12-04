@@ -92,17 +92,11 @@ async function applyPageConfigs() {
 
 async function goProduct() {
   await copyCode();
-  if (instagramAndroid) {
-    // alert(
-    //   'Por favor, toque no menu acima e escolha a opção "Abrir no Chrome".'
-    // );
-  } else {
-    await copyCode();
-    try {
-      window.location.replace(targetURL);
-    } catch (e) {
-      window.location = targetURL;
-    }
+  await copyCode();
+  try {
+    window.location.replace(targetURL);
+  } catch (e) {
+    window.location = targetURL;
   }
 }
 
@@ -233,15 +227,10 @@ async function startup() {
   }
   await getPageConfigs();
   if (!targetURL) {
-    try {
-      window.location.replace(pageConfigs.defaultTarget);
-    } catch (e) {
-      window.location = pageConfigs.defaultTarget;
-    }
-  } else {
-    await getCoupon();
-    applyPageConfigs();
+    targetURL = pageConfigs.defaultTarget;
   }
+  await getCoupon();
+  applyPageConfigs();
 
   registerVisit();
 }
