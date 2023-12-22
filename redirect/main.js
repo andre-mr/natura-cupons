@@ -217,6 +217,13 @@ async function registerVisit() {
   }
 }
 
+async function getValueFromDefaultTarget() {
+  const defaultConsultoriaMatch = pageConfigs.defaultTarget.match(
+    /(?:\?|&)consultoria=([^&]+)/
+  );
+  return defaultConsultoriaMatch ? defaultConsultoriaMatch[1] : "";
+}
+
 async function startup() {
   if (
     navigator.userAgent.includes("Instagram") &&
@@ -226,9 +233,32 @@ async function startup() {
     instagramAndroid = true;
   }
   await getPageConfigs();
+
   if (!targetURL) {
     targetURL = pageConfigs.defaultTarget;
   }
+
+  const consultoriaRegex = /(?:\?|&)consultoria=([^&]+)/;
+  const consultoriaMatch = targetURL.match(consultoriaRegex);
+  const valueFromDefaultTarget = await getValueFromDefaultTarget();
+  if (!consultoriaMatch || consultoriaMatch[1] !== valueFromDefaultTarget) {
+    const defaultConsultoriaValue = valueFromDefaultTarget;
+    const consultoriaReplacement = `consultoria=${defaultConsultoriaValue}`;
+
+    if (consultoriaMatch) {
+      targetURL = targetURL.replace(
+        consultoriaRegex,
+        `?${consultoriaReplacement}`
+      );
+    } else {
+      if (targetURL.includes("?")) {
+        targetURL += `&${consultoriaReplacement}`;
+      } else {
+        targetURL += `?${consultoriaReplacement}`;
+      }
+    }
+  }
+
   await getCoupon();
   applyPageConfigs();
 
